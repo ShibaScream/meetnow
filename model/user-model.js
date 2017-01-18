@@ -8,7 +8,7 @@ const mongoose = require('mongoose')
 
 // referenced http://cannoneyed.github.io/geojson/
 // http://stackoverflow.com/questions/32754119/how-to-perform-geospatial-queries-in-mongoose
-let userSchema = mongoose.Schema({
+const userSchema = mongoose.Schema({
   name: {type: String, required: true},
   password: {type: String, required: true},
   email: {type: String, required: true, unique: true},
