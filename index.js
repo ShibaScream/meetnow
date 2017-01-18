@@ -9,7 +9,6 @@ const router = Express.Router()
 const app = Express()
 
 // ROUTES
-const mongoose = require('mongoose')
 // const User = require('./model/user')
 // const Interest = require('./model/interest')
 // const Category = require('./model/category')
@@ -25,6 +24,7 @@ app.use(morgan('dev'))
 const httpErrors = require('./lib/httpErrors')
 
 // MONGODB
+const mongoose = require('mongoose')
 mongoose.Promise = Promise
 mongoose.connect(MONGO_URI).then(() => {
   console.log(`Mongo connected via ${MONGO_URI}`)
