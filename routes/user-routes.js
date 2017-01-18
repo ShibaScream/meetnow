@@ -26,9 +26,8 @@ module.exports = function(router) {
     }).catch(next);
   });
 
-  router.get('/user/:userId', function(req, res, next) {
-    //TODO if no user id is given, then show the user their logged in information
-    User.findOneById(req.params.userId).then(function(err, user) {
+  router.get('/user/:userId', authMiddleware, function(req, res, next) {
+    User.findOneById(req.params.userId || req.authorizedUserId).then(function(err, user) {
       if (err) throw err;
       delete user.password;
       delete user.email;
@@ -38,7 +37,7 @@ module.exports = function(router) {
     }).catch(next);
   });
 
-  router.put('/user/:userId', function(req, res, next) { //TODO add pre 'update' function to schema to hash password if password was updated
+  router.put('/user/:userId', authMiddleware, function(req, res, next) { //TODO add pre 'update' function to schema to hash password if password was updated
     User.findByIdAndUpdate(req.params.userId, { new: true }, req.body).then(function(err, user) {
       if (err) throw err;
       delete user.password;
