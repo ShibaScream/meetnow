@@ -28,4 +28,4 @@ const activitySchema = mongoose.Schema({
 
 activitySchema.index({ location : '2dsphere' })
 
-module.exports = mongoose.model('user', activitySchema)
+module.exports = mongoose.model('activity', activitySchema)
