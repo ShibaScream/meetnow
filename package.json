@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/ShibaScream/meetnow#readme",
   "dependencies": {
+    "basic-auth": "^1.1.0",
     "bcrypt": "^1.0.2",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
