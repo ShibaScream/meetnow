@@ -37,8 +37,8 @@ module.exports = function(router) {
     }).catch(next);
   });
 
-  router.put('/user/:userId', authMiddleware, function(req, res, next) { //TODO add pre 'update' function to schema to hash password if password was updated
-    User.findByIdAndUpdate(req.params.userId, { new: true }, req.body).then(function(err, user) {
+  router.put('/user', authMiddleware, function(req, res, next) { //TODO add pre 'update' function to schema to hash password if password was updated
+    User.findByIdAndUpdate(req.authorizedUserId, { new: true }, req.body).then(function(err, user) {
       if (err) throw err;
       delete user.password;
       res.json(user);
