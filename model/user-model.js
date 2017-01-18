@@ -21,7 +21,13 @@ const userSchema = mongoose.Schema({
   },
   lastLoginTime: {type: Date},
   radius: {type: Number, default: 3, required: true},
-  gender: {type: String},
+  gender: {
+    type: String,
+    validate: function(gender) {
+      const genderList = ['male', 'female', 'non-binary / third gender', 'prefer not to say']
+      return genderList.includes(gender.toLowerCase())
+    }
+  },
   age: {type: Number},
   interests: [{
     type: mongoose.Schema.Types.ObjectId,
