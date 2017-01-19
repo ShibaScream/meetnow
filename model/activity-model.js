@@ -26,6 +26,6 @@ const ActivitySchema = mongoose.Schema({
   endTime: {type: Date},
 }, {timestamp: true})
 
-activitySchema.index({ location : '2dsphere' })
+ActivitySchema.index({ location : '2dsphere' })
 
 module.exports = mongoose.model('activity', ActivitySchema)
