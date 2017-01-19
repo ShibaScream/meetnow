@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose')
 
-const activitySchema = mongoose.Schema({
+const ActivitySchema = mongoose.Schema({
   interest: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'interest'
@@ -28,4 +28,4 @@ const activitySchema = mongoose.Schema({
 
 activitySchema.index({ location : '2dsphere' })
 
-module.exports = mongoose.model('activity', activitySchema)
+module.exports = mongoose.model('activity', ActivitySchema)

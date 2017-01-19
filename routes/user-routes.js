@@ -1,5 +1,4 @@
 const parseAuth = require('basic-auth');
-
 const authMiddleware = require('../lib/authMiddleware');
 const User = require('../model/user-model');
 

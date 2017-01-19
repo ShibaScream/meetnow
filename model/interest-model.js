@@ -2,12 +2,12 @@
 
 const mongoose = require('mongoose')
 
-const interestSchema = mongoose.Schema({
+const InterestSchema = mongoose.Schema({
   name: {type: String, required: true},
   category: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'interest'
+    ref: 'category'
   }
 })
 
-module.exports = mongoose.model('interest', interestSchema)
+module.exports = mongoose.model('interest', InterestSchema)
