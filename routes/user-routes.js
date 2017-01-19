@@ -1,6 +1,7 @@
 'use strict'
 
 const parseAuth = require('basic-auth');
+
 const jsonWebToken = require('jsonwebtoken');
 
 jsonWebToken.KEY = process.env.JSON_TOKEN_KEY || 'abcdef';

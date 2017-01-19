@@ -8,7 +8,7 @@ const mongoose = require('mongoose')
 
 // referenced http://cannoneyed.github.io/geojson/
 // http://stackoverflow.com/questions/32754119/how-to-perform-geospatial-queries-in-mongoose
-const userSchema = mongoose.Schema({
+const UserSchema = mongoose.Schema({
   name: {type: String, required: true},
   password: {type: String, required: true},
   email: {type: String, required: true, unique: true},
@@ -39,6 +39,6 @@ const userSchema = mongoose.Schema({
   }
 }, {timestamp: true})
 
-userSchema.index({ location : '2dsphere' })
+UserSchema.index({ location : '2dsphere' })
 
-module.exports = mongoose.model('user', userSchema)
+module.exports = mongoose.model('user', UserSchema)

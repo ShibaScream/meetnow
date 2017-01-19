@@ -17,10 +17,11 @@ const interestSeeds = require('./seeds/interestSeeds')
 // const Interest = require('./model/interest')
 // const Category = require('./model/category')
 // const Activity = require('./model/Activity')
-require('./routes/activity-routes')(router)
-// require('./routes/category-routes')(router)
-// require('./routes/interest-routes')(router)
+
 require('./routes/user-routes')(router)
+require('./routes/activity-routes')(router)
+// require('./routes/interest-routes')(router)
+// require('./routes/category-routes')(router)
 
 // DEV
 const morgan = require('morgan')
