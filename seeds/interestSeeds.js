@@ -79,7 +79,7 @@ module.exports.seedInterests = function (categories) {
     .remove({})
     .then(() => {
       Interest
-        .create(interests)
+        .insertMany(interests)
         .then(createdInterests => {
           createdInterests.forEach(interest => {
             // find category associated with interest and push interest id into category's interests array

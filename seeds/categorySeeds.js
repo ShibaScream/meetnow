@@ -16,7 +16,7 @@ module.exports.seedCategories = function() {
       .remove({})
       .then(() => {
         Category
-          .create(categories)
+          .insertMany(categories)
           .then(resolve)
           .catch(reject)
       })
