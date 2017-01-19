@@ -2,7 +2,7 @@
 
 const Interest = require('../model/interest-model.js')
 
-module.exports = function (categories) {
+module.exports.seedInterests = function (categories) {
   let interests = [
     {
       name: 'Run',
@@ -82,8 +82,11 @@ module.exports = function (categories) {
         // find category associated with interest and push interest id into category's interests array
         categories[categories.findIndex(_findCategoryId, interest)].interests.push(interest._id)
       })
-      categories.save()
+      categories
+        .save()
+        .catch(err => console.error(err))
     })
+    .catch(err => console.error(err))
 
 
   function _findCategoryName (cat) {

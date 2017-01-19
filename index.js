@@ -8,6 +8,10 @@ const Express = require('express')
 const router = Express.Router()
 const app = Express()
 
+// SEEDS
+const categorySeeds = require('./seeds/categorySeeds')
+const interestSeeds = require('./seeds/interestSeeds')
+
 // ROUTES
 // const User = require('./model/user')
 // const Interest = require('./model/interest')
@@ -26,9 +30,18 @@ app.use(morgan('dev'))
 // MONGODB
 const mongoose = require('mongoose')
 mongoose.Promise = Promise
-mongoose.connect(MONGO_URI).then(() => {
-  console.log(`Mongo connected via ${MONGO_URI}`)
-})
+mongoose
+  .connect(MONGO_URI)
+  .then(() => {
+    console.log(`Mongo connected via ${MONGO_URI}`)
+    categorySeeds
+      .seedCategories()
+      .then(categories => {
+        interestSeeds.seedInterests(categories)
+      })
+      .catch(err => console.error(err))
+  })
+  .catch(err => console.error(err))
 
 app.use(router)
 // app.use(httpErrors)
