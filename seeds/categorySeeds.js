@@ -2,7 +2,7 @@
 
 const Category = require('../model/category-model')
 
-module.exports.seedCategories = function() {
+module.exports = function() {
   const categories = [
     {category: 'Active'},
     {category: 'Art'},
