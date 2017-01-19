@@ -5,6 +5,7 @@
       2,
       2
     ],
+    "strict": ["error", "global"],
     "quotes": [
       2,
       "single"

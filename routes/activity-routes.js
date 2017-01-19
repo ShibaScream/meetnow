@@ -1,3 +1,5 @@
+'use strict'
+
 const authMiddleware = require('../lib/authMiddleware')
 const Activity = require('../model/activity-model')
 

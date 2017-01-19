@@ -1,3 +1,5 @@
+'use strict'
+
 const parseAuth = require('basic-auth');
 const jsonWebToken = require('jsonwebtoken');
 
