@@ -72,25 +72,32 @@ module.exports.seedInterests = function (categories) {
 
   interests = interests.map(interest => {
     interest.category = categories[categories.findIndex(_findCategoryName, interest)]._id
+    return interest
   })
 
   Interest
     .remove({})
-    .create(interests)
-    .then(createdInterests => {
-      createdInterests.forEach(interest => {
-        // find category associated with interest and push interest id into category's interests array
-        categories[categories.findIndex(_findCategoryId, interest)].interests.push(interest._id)
-      })
-      categories
-        .save()
+    .then(() => {
+      Interest
+        .create(interests)
+        .then(createdInterests => {
+          createdInterests.forEach(interest => {
+            // find category associated with interest and push interest id into category's interests array
+            categories[categories.findIndex(_findCategoryId, interest)].interests.push(interest._id)
+          })
+          categories.forEach(category => {
+            category
+              .save()
+              .catch(err => console.error(err))
+          })
+        })
         .catch(err => console.error(err))
     })
     .catch(err => console.error(err))
 
 
   function _findCategoryName (cat) {
-    return cat.name === this.category
+    return cat.category === this.category
   }
 
   function _findCategoryId (cat) {

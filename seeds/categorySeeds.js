@@ -14,8 +14,12 @@ module.exports.seedCategories = function() {
   return new Promise( (resolve, reject) => {
     Category
       .remove({})
-      .create(categories)
-      .then(resolve)
+      .then(() => {
+        Category
+          .create(categories)
+          .then(resolve)
+          .catch(reject)
+      })
       .catch(reject)
   })
 }
