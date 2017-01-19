@@ -1,6 +1,10 @@
 'use strict'
 
 const parseAuth = require('basic-auth');
+const jsonWebToken = require('jsonwebtoken');
+
+jsonWebToken.KEY = process.env.JSON_TOKEN_KEY || 'abcdef';
+const TOKEN_EXPIRY_TIME = 60 * 60 * 24;
 
 const authMiddleware = require('../lib/authMiddleware');
 const User = require('../model/user-model');
@@ -20,9 +24,16 @@ module.exports = function(router) {
     User.findOne({ email: auth.name }, function (err, user) {
       if (err) throw err;
       user.checkPass(auth.pass).then((correct) => {
-        if (correct)
-          res.json({ token: 'token here' });
-        else
+        if (correct) {
+          let token = jsonWebToken.sign(user, jsonWebToken.KEY, {
+            expiresIn: TOKEN_EXPIRY_TIME
+          });
+
+          res.json({
+            token: token,
+            expiresIn: Date.now() + (TOKEN_EXPIRY_TIME * 1000)
+          });
+        } else
           throw new Error('Invalid credentials.');
       });
     }).catch(next);
