@@ -20,6 +20,9 @@ describe('activity-routes.js', function() {
     User.findOne({name: 'Runs More'})
     .then(function(err, user) {
       testUser = user
+      console.log(testUser)
+    }).catch(function(err) {
+      console.log('findOne failed')
     })
     chai.request(app)
     .post('/login')
