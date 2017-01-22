@@ -8,10 +8,16 @@ const Express = require('express')
 const router = Express.Router()
 const app = Express()
 
+//UTILITY MODULES
+const bodyParser = require('body-parser');
+
 // SEEDS
 const categorySeeds = require('./seeds/categorySeeds')
 const interestSeeds = require('./seeds/interestSeeds')
 const userSeeds = require('./seeds/userSeeds')
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 // ROUTES
 // const User = require('./model/user')
