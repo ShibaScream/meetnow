@@ -6,12 +6,11 @@ const app = require('../index.js')
 // const Activity = require('../model/activity-model.js')
 const User = require('../model/user-model.js')
 let server = null
-let activity = null
+let activity = null // <-- remove
 let testUser = null // <--- maybe
+let token = null
 chai.use(chaiHttp)
 
-//query for user and findOne name: whatever
-//log in user to get token
 describe('activity-routes.js', function() {
   before(function(done) {
     server = app.listen(3000, function() {
@@ -19,25 +18,16 @@ describe('activity-routes.js', function() {
     })
     User.findOne({name: 'Runs More'})
     .then(function(err, user) {
-      //something err
       testUser = user
     })
-    //login in the testUser to get token
     chai.request(app)
     .post('/login')
     .auth('runs.more@test.com', '1234pass')
     .end(function(err, res) {
-      
       //assign token to something
+      token = 'someThing' // update when userSeeds added
       console.log(res)
     })
-
-    // remove this junk
-    // activity = new Activity({
-    //   location: 'test',
-    //   startTime: Date.now(),
-    //   endTime: Date.now()
-    // })
     done()
   })
   after(function(done) {
@@ -46,7 +36,10 @@ describe('activity-routes.js', function() {
     })
     done()
   })
-  describe('activity/:id GET', function() {
+  describe('/activity POST', function() {
+
+  })
+  describe('/activity/:id GET', function() {
     it('should return an activity from the database', function(done) {
       chai.request(app)
       .get('/activitiy/01')
@@ -64,5 +57,11 @@ describe('activity-routes.js', function() {
         done()
       })
     })
+  })
+  describe('/activity/:id PUT', function() {
+
+  })
+  describe('/activity/:id DELETE', function() {
+
   })
 })
