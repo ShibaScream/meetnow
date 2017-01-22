@@ -1,7 +1,7 @@
 'use strict'
 
 const authMiddleware = require('../lib/authMiddleware');
-const Interest = require('../model/interests-model');
+const Interest = require('../model/interest-model');
 
 module.exports = function(router) {
   router.post('/interest', authMiddleware, function(req, res, next) {
