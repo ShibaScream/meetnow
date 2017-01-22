@@ -7,7 +7,11 @@ const InterestSchema = mongoose.Schema({
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'category'
-  }
+  },
+  users: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user'
+  }]
 })
 
 module.exports = mongoose.model('interest', InterestSchema)
