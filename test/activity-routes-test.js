@@ -17,19 +17,33 @@ describe('activity-routes.js', function() {
     server = app.listen(3000, function() {
       console.log('server up')
     })
-    User.findOne({name: 'Runs More'})
+    chai.request(app)
+    .post('/user')
+    .send({name:'testName', password:'pass', email:'testEmail', radius: 10})
+    .end(function(err, res) {
+      if(err) {
+        console.log('error in /user post')
+        console.log(err)
+      }
+      console.log('cool')
+    })
+    User.findOne({name: 'testName'})
     .then(function(err, user) {
       testUser = user
-      console.log(testUser)
+      console.log('id here')
+      console.log(testUser._id)
     }).catch(function(err) {
       console.log('findOne failed')
     })
     chai.request(app)
-    .post('/login')
-    .auth('runs.more@test.com', '1234pass')
+    .get('/login')
+    .auth('testEmail', 'pass')
     .end(function(err, res) {
-      token = 'someThing' // update when userSeeds added
-      console.log(res)
+      if (err) {
+        console.log('login error')
+      }
+      console.log(res.text)
+      token = res.text
     })
     done()
   })
