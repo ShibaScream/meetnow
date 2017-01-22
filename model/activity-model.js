@@ -3,6 +3,9 @@
 const mongoose = require('mongoose')
 
 const ActivitySchema = mongoose.Schema({
+  description: {
+    type: String
+  },
   interest: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'interest'
