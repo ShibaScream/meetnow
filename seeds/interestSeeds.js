@@ -75,25 +75,28 @@ module.exports.seedInterests = function (categories) {
     return interest
   })
 
-  Interest
-    .remove({})
-    .then(() => {
-      Interest
-        .insertMany(interests)
-        .then(createdInterests => {
-          createdInterests.forEach(interest => {
-            // find category associated with interest and push interest id into category's interests array
-            categories[categories.findIndex(_findCategoryId, interest)].interests.push(interest._id)
+  return new Promise( (resolve, reject) => {
+    Interest
+      .remove({})
+      .then(() => {
+        Interest
+          .insertMany(interests)
+          .then(createdInterests => {
+            createdInterests.forEach(interest => {
+              // find category associated with interest and push interest id into category's interests array
+              categories[categories.findIndex(_findCategoryId, interest)].interests.push(interest._id)
+            })
+            categories.forEach(category => {
+              category
+                .save()
+                .catch(err => console.error(err))
+            })
+            resolve(createdInterests)
           })
-          categories.forEach(category => {
-            category
-              .save()
-              .catch(err => console.error(err))
-          })
-        })
-        .catch(err => console.error(err))
-    })
-    .catch(err => console.error(err))
+          .catch(reject)
+      })
+    .catch(reject)
+  })
 
 
   function _findCategoryName (cat) {
@@ -101,6 +104,6 @@ module.exports.seedInterests = function (categories) {
   }
 
   function _findCategoryId (cat) {
-    return cat._id === this.category
+    return cat._id.equals(this.category)
   }
 }

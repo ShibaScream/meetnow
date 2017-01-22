@@ -13,10 +13,7 @@ const UserSchema = mongoose.Schema({
   password: {type: String, required: true},
   email: {type: String, required: true, unique: true},
   currentLocation: {
-    type: {
-      type: String,
-      default: 'Point'
-    },
+    type: { type: String, default: 'Point'},
     coordinates: [Number]
   },
   lastLoginTime: {type: Date},
