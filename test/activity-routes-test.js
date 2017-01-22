@@ -7,16 +7,19 @@ let server = null
 let activity = null
 chai.use(chaiHttp)
 
+//query for user and findOne name: whatever
+//log in user to get token
 describe('activity-routes.js', function() {
   before(function(done) {
     server = app.listen(3000, function() {
       console.log('server up')
     })
-    activity = new Activity({
-      location: 'test',
-      startTime: Date.now(),
-      endTime: Date.now()
-    })
+    // remove this junk
+    // activity = new Activity({
+    //   location: 'test',
+    //   startTime: Date.now(),
+    //   endTime: Date.now()
+    // })
     done()
   })
   after(function(done) {
