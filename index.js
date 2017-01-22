@@ -11,6 +11,7 @@ const app = Express()
 // SEEDS
 const categorySeeds = require('./seeds/categorySeeds')
 const interestSeeds = require('./seeds/interestSeeds')
+const userSeeds = require('./seeds/userSeeds')
 
 // ROUTES
 // const User = require('./model/user')
@@ -38,7 +39,14 @@ mongoose
     categorySeeds
       .seedCategories()
       .then(categories => {
-        interestSeeds.seedInterests(categories)
+        interestSeeds
+          .seedInterests(categories)
+          .then(interests => {
+            userSeeds
+              .seedUsers(interests)
+              .catch(err => console.error(err))
+          })
+          .catch(err => console.error(err))
       })
       .catch(err => console.error(err))
   })
@@ -47,6 +55,7 @@ mongoose
 app.use(router)
 // app.use(httpErrors)
 
+// if not running mocha tests, start listening
 if(require.main === module) {
   app.listen(PORT, () => console.log(`server started on port ${PORT}`))
 }
