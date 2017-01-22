@@ -56,9 +56,11 @@ module.exports = function(router) {
         activitiesWithin = activities.filter(function(activity) {
           return distanceInMiles(activity.startLocation.coordinates[0], activity.startLocation.coordinates[1], lat, lng) < radius;
         });
+        res.json(activitiesWithin);
       }).catch(next);
+    } else {
+      next(new Error('Expected radius, lat, and lng'));
     }
-    res.json(activitiesWithin);
   });
 }
 
