@@ -42,8 +42,8 @@ describe('activity-routes.js', function() {
       if (err) {
         console.log('login error')
       }
-      console.log(res.text)
-      token = res.text
+      token = JSON.parse(res.text).token
+      console.log(token)
     })
     done()
   })
