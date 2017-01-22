@@ -19,12 +19,13 @@ module.exports = function(router) {
     }).catch(next);
   });
 
-  router.post('/login', function(req, res, next) {
+  router.get('/login', function(req, res, next) {
     let auth = parseAuth(req);
     if (!auth) throw new Error('Expected authorization header.');
     User.findOne({ email: auth.name }, function (err, user) {
       if (err) throw err;
-      user.checkPass(auth.pass).then((correct) => {
+      user.checkPass(auth.pass, (err, correct) => {
+        if (err) throw err;
         if (correct) {
           let token = jsonWebToken.sign(user, jsonWebToken.KEY, {
             expiresIn: TOKEN_EXPIRY_TIME
