@@ -20,20 +20,15 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // ROUTES
-// const User = require('./model/user')
-// const Interest = require('./model/interest')
-// const Category = require('./model/category')
-// const Activity = require('./model/Activity')
-
 require('./routes/user-routes')(router)
 require('./routes/activity-routes')(router)
-// require('./routes/interest-routes')(router)
-// require('./routes/category-routes')(router)
+require('./routes/interest-routes')(router)
+require('./routes/category-routes')(router)
 
 // DEV
 const morgan = require('morgan')
 app.use(morgan('dev'))
-// const httpErrors = require('./lib/httpErrors')
+const httpErrors = require('./lib/httpErrors')
 
 // MONGODB
 const mongoose = require('mongoose')
@@ -59,7 +54,7 @@ mongoose
   .catch(err => console.error(err))
 
 app.use(router)
-// app.use(httpErrors)
+app.use(httpErrors)
 
 // if not running mocha tests, start listening
 if(require.main === module) {
