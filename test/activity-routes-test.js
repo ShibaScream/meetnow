@@ -12,8 +12,8 @@ let testUser = null // <--- maybe
 let token = null // <--- maybe
 chai.use(chaiHttp)
 
-describe('activity-routes.js', function() {
-  before(function(done) {
+describe('activity-routes.js', () => {
+  before(done => {
     server = app.listen(3000, function() {
       console.log('server up')
     })
@@ -26,14 +26,16 @@ describe('activity-routes.js', function() {
         console.log(err)
       }
       console.log('cool')
+      console.log(res.text)
       testUser = JSON.parse(res.text)
       console.log(testUser)
+      console.log(testUser._id)
     })
     // User.findOne({name: 'testName'})
     // .then(function(err, user) {
-    //   testUser = user
-    //   console.log('id here')
-    //   console.log(testUser._id)
+    //   console.log('findOne worked!')
+    //   // console.log(user) // <---This may be working now
+    //   // testUser = user
     // }).catch(function(err) {
     //   console.log('findOne failed')
     // })
@@ -75,13 +77,14 @@ describe('activity-routes.js', function() {
         done()
       })
     })
-    it('should create an event and return 200 for valid requests', function(done) {
+    it('should create an event and return 200 for valid requests', done => {
       chai.request(app)
       .post('/activity')
       .set('Authorization', 'Bearer ' + token) // not sure about this format
-      .send({description: 'test description text', interest: 10, host: testUser._id, startLocation: 'starting location', startTime: Date.now()}) // update when seeds added
+      .send({description: 'test description text', host: testUser._id, startLocation: 'starting location', startTime: Date.now()}) // update when seeds added
       .end(function(err, res) {
         expect(res.status).to.equal(200)
+
         activity = 'something from res' // update when seeds added
         done()
       })
