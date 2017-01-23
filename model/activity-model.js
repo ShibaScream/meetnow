@@ -1,5 +1,6 @@
 'use strict'
 
+const GeoJSON = require('mongoose-geojson-schema')
 const mongoose = require('mongoose')
 
 const ActivitySchema = mongoose.Schema({
@@ -18,17 +19,11 @@ const ActivitySchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user'
   }],
-  startLocation: {
-    type: {
-      type: String,
-      default: 'Point'
-    },
-    coordinates: [Number]
-  },
-  startTime: {type: Date, required: true},
+  startLocation: mongoose.Schema.Types.Point,
+  startTime: {type: Date, default: Date.now},
   endTime: {type: Date},
 }, {timestamp: true})
 
-ActivitySchema.index({ location : '2dsphere' })
+ActivitySchema.index({ startLocation : '2dsphere' })
 
 module.exports = mongoose.model('activity', ActivitySchema)
