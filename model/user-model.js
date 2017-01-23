@@ -34,7 +34,7 @@ const UserSchema = mongoose.Schema({
   }
 }, {timestamp: true})
 
-UserSchema.index({ location : '2dsphere' })
+UserSchema.index({ currentLocation : '2dsphere' })
 
 function hashPass (next) {
   if (!this.isModified('password'))
