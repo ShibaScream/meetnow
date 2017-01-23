@@ -18,7 +18,7 @@ module.exports = function(router) {
       .catch(next)
   })
 
-  router.get('/activity/:id', function(req, res, next) {
+  router.get('/activity/:id', authMiddleware, function(req, res, next) {
     Activity
       .findById(req.params.id)
       .then(function(err, activity) {
