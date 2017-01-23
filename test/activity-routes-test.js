@@ -26,15 +26,17 @@ describe('activity-routes.js', function() {
         console.log(err)
       }
       console.log('cool')
+      testUser = JSON.parse(res.text)
+      console.log(testUser)
     })
-    User.findOne({name: 'testName'})
-    .then(function(err, user) {
-      testUser = user
-      console.log('id here')
-      console.log(testUser._id)
-    }).catch(function(err) {
-      console.log('findOne failed')
-    })
+    // User.findOne({name: 'testName'})
+    // .then(function(err, user) {
+    //   testUser = user
+    //   console.log('id here')
+    //   console.log(testUser._id)
+    // }).catch(function(err) {
+    //   console.log('findOne failed')
+    // })
     chai.request(app)
     .get('/login')
     .auth('testEmail', 'pass')
@@ -57,6 +59,7 @@ describe('activity-routes.js', function() {
     it('should return bad request for POST with no body', function(done) {
       chai.request(app)
       .post('/activity')
+      .set('Authorization', `Bearer ${token}`) // not sure about this format
       .end(function(err, res) {
         expect(res.status).to.equal(400)
         done()
@@ -65,6 +68,7 @@ describe('activity-routes.js', function() {
     it('should return 401 for request without a token', function(done) {
       chai.request(app)
       .post('/activity')
+      .set('Authorization', 'Bearer ' + token) // not sure about this format
       .send({description: 'test description text', interest: 10, host: testUser._id, startLocation: 'starting location', startTime: Date.now()}) // update when seeds added
       .end(function(err, res) {
         expect(res.status).to.equal(401)
