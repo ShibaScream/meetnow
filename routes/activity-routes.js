@@ -89,7 +89,7 @@ module.exports = function(router) {
         if(activity.host == req.authorizedUserId) {
           activity.remove(function(err) {
             if(err) return next(createError(500, err.message))
-            res.status(202)
+            res.status(202).end()
           })
         }
       })

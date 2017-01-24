@@ -117,7 +117,7 @@ describe('activity-routes.js', () => {
     it('should return 400 for a request without a body', function(done) {
       chai.request(app)
       .put(`/activity/${activity._id}`)
-      .send(activityData)
+      .set('authorization', 'Bearer BADTOKEN')
       .end(function(err, res) {
         expect(res.status).to.equal(400)
         done()
