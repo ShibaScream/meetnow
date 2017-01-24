@@ -11,7 +11,7 @@ module.exports = function(router) {
   });
 
   router.get('/interests', function(req, res, next) {
-    Interest.find({}).then(function(err, categories) {
+    Interest.find({}).then(function(categories) {
       res.json(categories.map((interest) => interest._id));
     }).catch(next);
   });
