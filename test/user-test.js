@@ -14,8 +14,10 @@ chai.use(chaiHttp)
 
 let server = null
 
-let username = 'tester'
-let password = 'test'
+let username = 'far.away2@test.com'
+let password = '1236pass'
+let user2 = 'sees.lots@test.com'
+let pass2 = '1235pass'
 let token = ''
 
 chai.use(chaiHttp)
@@ -42,16 +44,20 @@ describe('authentication app', function() {
       .request(app)
       .post('/user')
       .send({
-        name: 'dpuert@gmail.com',
-        password: password,
-        email: username,
-        currentLocation: [122.3321, 47.6062],
-        radius: 10,
-        gender: 'male',
-        age: 32 ,
-        interests: ['58853b381bec7e61ead3890a', '58853b381bec7e61ead3890c', '58853b381bec7e61ead38910']
+        'name': 'Far Away2',
+        'password': password,
+        'email': username,
+        'currentLocation': {
+          'type': 'Point',
+          'coordinates': [117.4260, 47.6588]
+        },
+        'radius': 30,
+        'gender': 'male',
+        'age': 27,
+        'interests': ['5886df9d3dfccb15c2f091cc']
       })
       .end(function(err, res) {
+        // console.log(res)
         expect(res).to.have.status(200)
         // expect(res.body).to.not.be.array
         // expect(res.body.username).to.equal(username)
@@ -65,7 +71,7 @@ describe('authentication app', function() {
       chai
       .request(app)
       .get('/login')
-      .auth(username, password)
+      .auth(user2, pass2)
       //.set('authorization', `Bearer ${token}`)
       .end(function(err, res) {
         expect(res).to.have.status(200)

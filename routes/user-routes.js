@@ -12,19 +12,26 @@ const User = require('../model/user-model');
 
 module.exports = function(router) {
   router.post('/user', function(req, res, next) {
-    new User(req.body).save().then(function(err, user) {
-      if (err) next(err);
-      delete user.password;
-      res.json(user);
-    }).catch(next);
-  });
+    new User(req.body)
+      .save()
+      .then(user => {
+        user.password = undefined
+        console.log(user)
+        res.json(user)
+      })
+      .catch(err => {
+        next(createError(400, `${err.name}: ${err.message}`))
+      })
+  })
 
   router.get('/login', function(req, res, next) {
-    let auth = parseAuth(req);
+    let auth = parseAuth(req)
+    console.log(auth)
     if (!auth) next(createError(403, 'Expected authorization header.'))
     User
-      .findOne({ email: auth.name }, function (err, user) {
-        if (err) return next(err)
+      .findOne({ email: auth.name })
+      .then(user => {
+        if (user == null) return next(createError(404, 'User not found'))
         user
           .checkPass(auth.pass, (err, correct) => {
             if (err) return next(err)
