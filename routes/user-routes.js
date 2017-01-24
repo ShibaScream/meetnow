@@ -70,6 +70,25 @@ module.exports = function(router) {
       .catch(next)
   });
 
+  router.get('/user/search', authMiddleware, function(req, res, next) {
+    let lat = req.query.lat;
+    let lng = req.query.lng;
+    let interestId = req.query.interest;
+    if (!lat || !lng)
+      return next(new Error('Expected lattitude and longitude.'));
+    User.find({ currentLocation: {
+      $nearSphere: {
+        $geometry: { type: 'Point', coordinates: [lng, lat] },
+        $minDistance: 0,
+        $maxDistance: req.authorizedUser.radius
+      }
+    }}).then(activities => {
+      if (interestId)
+        activities = activities.filter(activity => activity.interest == interestId);
+      res.json(activities)
+    }).catch(next);
+  });
+
   router.put('/user', authMiddleware, function(req, res, next) { //TODO add pre 'update' function to schema to hash password if password was updated
     User
       .findByIdAndUpdate(req.authorizedUserId, { new: true }, req.body)
