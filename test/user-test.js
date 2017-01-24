@@ -18,7 +18,7 @@ let username = 'far.away2@test.com'
 let password = '1236pass'
 let user2 = 'sees.lots@test.com'
 let pass2 = '1235pass'
-let token = ''
+let token = null
 
 chai.use(chaiHttp)
 
@@ -75,6 +75,8 @@ describe('authentication app', function() {
       //.set('authorization', `Bearer ${token}`)
       .end(function(err, res) {
         expect(res).to.have.status(200)
+        token = res.body.token
+        expect(token).to.not.be.null
         // expect(res.body).to.not.be.array
         // expect(res.body.username).to.equal(username)
         done()
