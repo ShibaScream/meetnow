@@ -9,17 +9,22 @@ const ActivitySchema = mongoose.Schema({
   },
   interest: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'interest'
+    ref: 'interest',
+    required: true
   },
   host: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user'
+    ref: 'user',
+    required: true
   },
   participants: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user'
   }],
-  startLocation: mongoose.Schema.Types.Point,
+  startLocation: {
+    type: mongoose.Schema.Types.Point,
+    required: true
+  },
   startTime: {type: Date, default: Date.now},
   endTime: {type: Date},
 }, {timestamp: true})
