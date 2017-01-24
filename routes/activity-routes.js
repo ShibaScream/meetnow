@@ -40,7 +40,7 @@ module.exports = function(router) {
   })
 
   router.post('/activity', authMiddleware, function(req, res, next) {
-    if (!req.body) return next(createError(400, 'No data included in POST request'))
+    if (Object.keys(req.body).length === 0) return next(createError(400, 'No data included in POST request'))
     let body = req.body
     body.host = req.authorizedUserId
     // console.log(body)
@@ -57,13 +57,14 @@ module.exports = function(router) {
     Activity
       .findById(req.params.id)
       .then(activity => {
+        if(Object.keys(activity).length === 0) return next(createError(404, 'Not Found'))
         res.json(activity)
       })
       .catch(next)
   })
 
   router.put('/activity/:id', authMiddleware, function(req, res, next) {
-    if (!req.body) return next(createError(400, 'No data included in PUT request'))
+    if (Object.keys(req.body).length === 0) return next(createError(400, 'No data included in PUT request'))
     Activity
       .findById(req.params.id)
       .then(activity => {

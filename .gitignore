@@ -118,4 +118,4 @@ jspm_packages
 .nfs*
 
 # End of https://www.gitignore.io/api/macos,windows,git,node,linux
-'db'
+db/

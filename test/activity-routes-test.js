@@ -3,12 +3,22 @@ const chai = require('chai')
 const expect = require('chai').expect
 const chaiHttp = require('chai-http')
 const app = require('../index.js')
-const User = require('../model/user-model.js')
 let server = null
 
+const activityData = {
+  description: 'test description text',
+  interest: '58855624c607c70f24b00597',
+  startLocation: {
+    type: 'Point',
+    coordinates: [
+      122.3321,
+      47.6062
+    ]
+  }
+}
 let activity = null
 let testUser = null // <--- maybe
-let token = null // <--- maybe
+let token = null
 chai.use(chaiHttp)
 
 describe('activity-routes.js', () => {
@@ -19,11 +29,8 @@ describe('activity-routes.js', () => {
       .get('/login')
       .auth('runs.more@test.com', '1234pass')
       .end(function(err, res) {
-        if (err) {
-          console.log('login error')
-        }
+        expect(err).to.be.null
         token = JSON.parse(res.text).token
-        console.log(token)
         done()
       })
     })
@@ -47,24 +54,23 @@ describe('activity-routes.js', () => {
     it('should return 401 for request without a token', function(done) {
       chai.request(app)
       .post('/activity')
-      .set('Authorization', `Bearer ${token}`)
-      .send({description: 'test description text', interest: 10, host: testUser._id, startLocation: 'starting location', startTime: Date.now()}) // update when seeds added
+      // .set('authorization', `Bearer ${token}`)
+      .send(activityData)
       .end(function(err, res) {
         expect(res.status).to.equal(401)
         done()
       })
     })
     it('should create an event and return 200 for valid requests', (done) => {
-      console.log('testUser here')
-      console.log(testUser)
+      // console.log('testUser here')
+      // console.log(testUser)
       chai.request(app)
       .post('/activity')
-      .set('Authorization', `Bearer ${token}`) // not sure about this format
-      .send({description: 'test description text', host: testUser._id, startLocation: 'starting location', startTime: Date.now()}) // update when seeds added
+      .set('authorization', `Bearer ${token}`)
+      .send(activityData)
       .end(function(err, res) {
         expect(res.status).to.equal(200)
-
-        activity = 'something from res' // update when seeds added
+        activity = res.body
         done()
       })
     })
@@ -81,8 +87,9 @@ describe('activity-routes.js', () => {
     it('should return an activity from the database', function(done) {
       chai.request(app)
       .get(`/activity/${activity._id}`)
+      .set('authorization', `Bearer ${token}`)
       .end(function(err, res) {
-        console.log(activity)
+        // console.log(activity)
         expect(res.status).to.equal(200)
         done()
       })
@@ -92,7 +99,7 @@ describe('activity-routes.js', () => {
     it('should return 401 unauthorized for request without a token', function(done) {
       chai.request(app)
       .put(`/activity/${activity._id}`)
-      .send({description: 'new description', interest: 10, host: testUser._id, startLocation: 'new location', startTime: Date.now()}) // update when seeds added
+      .send(activityData)
       .end(function(err, res) {
         expect(res.status).to.equal(401)
         done()
@@ -101,8 +108,8 @@ describe('activity-routes.js', () => {
     it('should return 403 for a request with the wrong user token', function(done) {
       chai.request(app)
       .put(`/activity/${activity._id}`)
-      .set('Authorization', 'Bearer BADTOKEN') // enter a valid token for the incorrect user here
-      .send({description: 'new description', interest: 10, host: testUser._id, startLocation: 'new location', startTime: Date.now()}) // update when seeds added
+      .set('authorization', 'Bearer BADTOKEN')
+      .send(activityData)
       .end(function(err, res) {
         expect(res.status).to.equal(403)
         done()
@@ -111,7 +118,7 @@ describe('activity-routes.js', () => {
     it('should return 400 for a request without a body', function(done) {
       chai.request(app)
       .put(`/activity/${activity._id}`)
-      .send({description: 'new description', interest: 10, host: testUser._id, startLocation: 'new location', startTime: Date.now()}) // update when seeds added
+      .send(activityData)
       .end(function(err, res) {
         expect(res.status).to.equal(400)
         done()
@@ -120,8 +127,8 @@ describe('activity-routes.js', () => {
     it('should return 404 when trying to change an activity that does not exist', function(done) {
       chai.request(app)
       .put('/activity/10')
-      .set('Authorization', `Bearer ${token}`) // check format for this
-      .send({description: 'new description', interest: 10, host: testUser._id, startLocation: 'new location', startTime: Date.now()}) // update when seeds added
+      .set('authorization', `Bearer ${token}`)
+      .send(activityData)
       .end(function(err, res) {
         expect(res.status).to.equal(404)
         done()
@@ -130,8 +137,8 @@ describe('activity-routes.js', () => {
     it('should return 200 for a request without a body', function(done) {
       chai.request(app)
       .put(`/activity/${activity._id}`)
-      .set('Authorization', `Bearer ${token}`) // check format for this
-      .send({description: 'new description', interest: 10, host: testUser._id, startLocation: 'new location', startTime: Date.now()}) // update when seeds added
+      .set('authorization', `Bearer ${token}`)
+      .send(activityData)
       .end(function(err, res) {
         expect(res.status).to.equal(200)
         done()
@@ -150,7 +157,7 @@ describe('activity-routes.js', () => {
     it('should return 403 for a request with the wrong user token', function(done) {
       chai.request(app)
       .del(`/activity/${activity._id}`)
-      .set('Authorization', 'Bearer BADTOKEN') // enter a valid token for the incorrect user here
+      .set('Authorization', 'Bearer BADTOKEN')
       .end(function(err, res) {
         expect(res.status).to.equal(403)
         done()
@@ -159,7 +166,7 @@ describe('activity-routes.js', () => {
     it('should return 404 when trying to delete an activity that does not exist', function(done) {
       chai.request(app)
       .del('/activity/10')
-      .set('Authorization', `Bearer ${token}`) // check format for this
+      .set('authorization', `Bearer ${token}`) // check format for this
       .end(function(err, res) {
         expect(res.status).to.equal(404)
         done()
@@ -168,7 +175,7 @@ describe('activity-routes.js', () => {
     it('should return 202 when an activity is deleted', function(done) {
       chai.request(app)
       .del(`/activity/${activity._id}`)
-      .set('Authorization', `Bearer ${token}`) // check format for this
+      .set('authorization', `Bearer ${token}`) // check format for this
       .end(function(err, res) {
         expect(res.status).to.equal(202)
         done()
