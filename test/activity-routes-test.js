@@ -17,7 +17,6 @@ const activityData = {
   }
 }
 let activity = null
-let testUser = null // <--- maybe
 let token = null
 chai.use(chaiHttp)
 
@@ -111,7 +110,7 @@ describe('activity-routes.js', () => {
       .set('authorization', 'Bearer BADTOKEN')
       .send(activityData)
       .end(function(err, res) {
-        expect(res.status).to.equal(403)
+        expect(res.status).to.equal(401)
         done()
       })
     })
@@ -159,14 +158,14 @@ describe('activity-routes.js', () => {
       .del(`/activity/${activity._id}`)
       .set('Authorization', 'Bearer BADTOKEN')
       .end(function(err, res) {
-        expect(res.status).to.equal(403)
+        expect(res.status).to.equal(401)
         done()
       })
     })
     it('should return 404 when trying to delete an activity that does not exist', function(done) {
       chai.request(app)
       .del('/activity/10')
-      .set('authorization', `Bearer ${token}`) // check format for this
+      .set('authorization', `Bearer ${token}`)
       .end(function(err, res) {
         expect(res.status).to.equal(404)
         done()
@@ -175,7 +174,7 @@ describe('activity-routes.js', () => {
     it('should return 202 when an activity is deleted', function(done) {
       chai.request(app)
       .del(`/activity/${activity._id}`)
-      .set('authorization', `Bearer ${token}`) // check format for this
+      .set('authorization', `Bearer ${token}`)
       .end(function(err, res) {
         expect(res.status).to.equal(202)
         done()
