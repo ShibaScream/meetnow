@@ -11,7 +11,7 @@ module.exports = function(router) {
   });
 
   router.get('/categories', function(req, res, next) {
-    Category.find({}).then(function(err, categories) {
+    Category.find({}).then(function(categories) {
       res.json(categories.map((category) => category._id));
     }).catch(next);
   });
