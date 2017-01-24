@@ -2,8 +2,9 @@
 
 const authMiddleware = require('../lib/authMiddleware')
 const Activity = require('../model/activity-model')
+const createError = require('http-errors')
 
-const MILES_PER_DEG = 55.2428;
+// const MILES_PER_DEG = 55.2428;
 
 module.exports = function(router) {
 
@@ -12,9 +13,11 @@ module.exports = function(router) {
     let lat = req.query.lat
     let lng = req.query.lng
     // let activitiesWithin = []
-    if (dist && lat != undefined && lng != undefined) {
-      let coords = [lng, lat]
-      Activity
+    if (lat == undefined || lng == undefined) {
+      return next(createError(400, 'Must include latitude and longitude'))
+    }
+    let coords = [lng, lat]
+    Activity
       .find({
         startLocation: {
           $nearSphere: {
@@ -34,15 +37,13 @@ module.exports = function(router) {
         res.json(activities)
       })
       .catch(next)
-    } else {
-      next(new Error('Expected radius, lat, and lng'))
-    }
   })
 
   router.post('/activity', authMiddleware, function(req, res, next) {
-    let body = req.body;
+    if (!req.body) return next(createError(400, 'No data included in POST request'))
+    let body = req.body
     body.host = req.authorizedUserId
-    console.log(body)
+    // console.log(body)
     new Activity(body)
       .save()
       .then(activity => {
@@ -52,6 +53,7 @@ module.exports = function(router) {
   })
 
   router.get('/activity/:id', authMiddleware, function(req, res, next) {
+    if (!req.params.id) return next(createError(400, 'No activity id'))
     Activity
       .findById(req.params.id)
       .then(activity => {
@@ -61,6 +63,7 @@ module.exports = function(router) {
   })
 
   router.put('/activity/:id', authMiddleware, function(req, res, next) {
+    if (!req.body) return next(createError(400, 'No data included in PUT request'))
     Activity
       .findById(req.params.id)
       .then(activity => {
@@ -78,6 +81,7 @@ module.exports = function(router) {
   })
 
   router.delete('/activity/:id', authMiddleware, function(req, res, next) {
+    if (!req.params.id) return next(createError(400, 'No activity id'))
     Activity
       .findById(req.params.id)
       .then(activity => {
@@ -93,6 +97,6 @@ module.exports = function(router) {
 
 }
 
-function distanceInMiles(x1, y1, x2, y2) {
-  return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)) * MILES_PER_DEG;
-}
+// function distanceInMiles(x1, y1, x2, y2) {
+//   return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)) * MILES_PER_DEG;
+// }
