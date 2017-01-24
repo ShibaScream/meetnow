@@ -68,7 +68,11 @@ module.exports = function(router) {
     Activity
       .findById(req.params.id)
       .then(activity => {
-        if(activity.host.equals(req.authorizedUserId) && Object.keys(activity).length > 0) {
+        if (activity == null) {
+          return next(createError(404, 'Activity not found'))
+        }
+
+        if(activity.host.equals(req.authorizedUserId)) {
           activity
             .update(req.body)
             .save()
@@ -77,7 +81,7 @@ module.exports = function(router) {
             })
             .catch(next)
         } else {
-          next(createError(400, 'Activity not found'))
+          next(createError(401, 'Not authorized'))
         }
       })
       .catch(next)
@@ -88,13 +92,16 @@ module.exports = function(router) {
     Activity
       .findById(req.params.id)
       .then(activity => {
-        if(activity.host.equals(req.authorizedUserId) && Object.keys(activity).length > 0) {
+        if (activity == null) {
+          return next(createError(404, 'Activity not found'))
+        }
+        if(activity.host.equals(req.authorizedUserId)) {
           activity.remove(function(err) {
             if(err) return next(createError(404, err.message))
             res.status(202).end()
           })
         } else {
-          return next(createError(404, 'Delete failed'))
+          next(createError(401, 'Not authorized'))
         }
       })
       .catch(next)

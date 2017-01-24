@@ -137,9 +137,8 @@ describe('activity-routes.js', () => {
       chai.request(app)
       .put(`/activity/${activity._id}`)
       .set('authorization', `Bearer ${token}`)
-      .send(activityData)
       .end(function(err, res) {
-        expect(res.status).to.equal(200)
+        expect(res.status).to.equal(400)
         done()
       })
     })
@@ -164,7 +163,7 @@ describe('activity-routes.js', () => {
     })
     it('should return 404 when trying to delete an activity that does not exist', function(done) {
       chai.request(app)
-      .del('/activity/10')
+      .del('/activity/58856046fd98115467e5f7a0')
       .set('authorization', `Bearer ${token}`)
       .end(function(err, res) {
         expect(res.status).to.equal(404)
