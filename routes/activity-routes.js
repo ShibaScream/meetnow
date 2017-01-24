@@ -2,8 +2,9 @@
 
 const authMiddleware = require('../lib/authMiddleware')
 const Activity = require('../model/activity-model')
+const createError = require('http-errors')
 
-const MILES_PER_DEG = 55.2428;
+// const MILES_PER_DEG = 55.2428;
 
 module.exports = function(router) {
 
@@ -13,9 +14,13 @@ module.exports = function(router) {
     let lng = req.query.lng
     let interestId = req.query.interest;
     // let activitiesWithin = []
-    if (lat != undefined && lng != undefined) {
-      let coords = [lng, lat]
-      Activity
+
+    if (lat == undefined || lng == undefined) {
+      return next(createError(400, 'Must include latitude and longitude'))
+    }
+    
+    let coords = [lng, lat]
+    Activity
       .find({
         startLocation: {
           $nearSphere: {
@@ -38,15 +43,13 @@ module.exports = function(router) {
         res.json(activities)
       })
       .catch(next)
-    } else {
-      next(new Error('Expected radius, lat, and lng'))
-    }
   })
 
   router.post('/activity', authMiddleware, function(req, res, next) {
-    let body = req.body;
+    if (Object.keys(req.body).length === 0) return next(createError(400, 'No data included in POST request'))
+    let body = req.body
     body.host = req.authorizedUserId
-    console.log(body)
+    // console.log(body)
     new Activity(body)
       .save()
       .then(activity => {
@@ -56,19 +59,26 @@ module.exports = function(router) {
   })
 
   router.get('/activity/:id', authMiddleware, function(req, res, next) {
+    if (!req.params.id) return next(createError(400, 'No activity id'))
     Activity
       .findById(req.params.id)
       .then(activity => {
+        if(Object.keys(activity).length === 0) return next(createError(404, 'Not Found'))
         res.json(activity)
       })
       .catch(next)
   })
 
   router.put('/activity/:id', authMiddleware, function(req, res, next) {
+    if (Object.keys(req.body).length === 0) return next(createError(400, 'No data included in PUT request'))
     Activity
       .findById(req.params.id)
       .then(activity => {
-        if(activity.host == req.authorizedUserId) {
+        if (activity == null) {
+          return next(createError(404, 'Activity not found'))
+        }
+
+        if(activity.host.equals(req.authorizedUserId)) {
           activity
             .update(req.body)
             .save()
@@ -76,20 +86,28 @@ module.exports = function(router) {
               res.json(activity)
             })
             .catch(next)
+        } else {
+          next(createError(401, 'Not authorized'))
         }
       })
       .catch(next)
   })
 
   router.delete('/activity/:id', authMiddleware, function(req, res, next) {
+    if (!req.params.id) return next(createError(400, 'No activity id'))
     Activity
       .findById(req.params.id)
       .then(activity => {
-        if(activity.host == req.authorizedUserId) {
+        if (activity == null) {
+          return next(createError(404, 'Activity not found'))
+        }
+        if(activity.host.equals(req.authorizedUserId)) {
           activity.remove(function(err) {
-            if(err) throw err
-            res.status(202)
+            if(err) return next(createError(404, err.message))
+            res.status(202).end()
           })
+        } else {
+          next(createError(401, 'Not authorized'))
         }
       })
       .catch(next)
@@ -97,6 +115,6 @@ module.exports = function(router) {
 
 }
 
-function distanceInMiles(x1, y1, x2, y2) {
-  return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)) * MILES_PER_DEG;
-}
+// function distanceInMiles(x1, y1, x2, y2) {
+//   return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)) * MILES_PER_DEG;
+// }

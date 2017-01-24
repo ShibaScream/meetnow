@@ -12,11 +12,16 @@ const User = require('../model/user-model');
 
 module.exports = function(router) {
   router.post('/user', function(req, res, next) {
-    new User(req.body).save().then(function(err, user) {
-      if (err) next(err);
-      delete user.password;
-      res.json(user);
-    }).catch(next);
+    let user = new User(req.body)
+    user.save()
+    .then(user => {
+      res.json(user)
+    }).catch(next)
+    // new User(req.body).save().then(function(err, user) {
+    //   if (err) next(err);
+    //   delete user.password;
+    //   res.json(user);
+    // }).catch(next);
   });
 
   router.get('/login', function(req, res, next) {
