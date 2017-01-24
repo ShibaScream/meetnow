@@ -68,7 +68,7 @@ module.exports = function(router) {
     Activity
       .findById(req.params.id)
       .then(activity => {
-        if(activity.host == req.authorizedUserId) {
+        if(activity.host == req.authorizedUserId && Object.keys(activity).length > 0) {
           activity
             .update(req.body)
             .save()
@@ -76,6 +76,8 @@ module.exports = function(router) {
               res.json(activity)
             })
             .catch(next)
+        } else {
+          next(createError(400, 'Activity not found'))
         }
       })
       .catch(next)
