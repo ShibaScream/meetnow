@@ -139,6 +139,26 @@ describe('activity-routes.js', () => {
       })
     })
   })
+  describe('/activity/search', function() {
+    it('should return 200 for a valid request', function(done) {
+      chai.request(app)
+      .get('/activity/search')
+      .query({ lat:47.6062, lng:122.3321})
+      .end(function(err, res) {
+        expect(res.status).to.equal(200)
+        console.log(res.text)
+        done()
+      })
+    })
+    it('should return 400 for a request without lat and lng values', function(done) {
+      chai.request(app)
+      .get('/activity/search')
+      .end(function(err, res) {
+        expect(res.status).to.equal(400)
+        done()
+      })
+    })
+  })
   describe('/activity/:id DELETE', function() {
     it('should return 401 unauthorized for request without a token', function(done) {
       chai.request(app)
