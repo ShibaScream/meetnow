@@ -53,7 +53,6 @@ describe('activity-routes.js', () => {
     it('should return 401 for request without a token', function(done) {
       chai.request(app)
       .post('/activity')
-      // .set('authorization', `Bearer ${token}`)
       .send(activityData)
       .end(function(err, res) {
         expect(res.status).to.equal(401)
@@ -61,8 +60,6 @@ describe('activity-routes.js', () => {
       })
     })
     it('should create an event and return 200 for valid requests', (done) => {
-      // console.log('testUser here')
-      // console.log(testUser)
       chai.request(app)
       .post('/activity')
       .set('authorization', `Bearer ${token}`)
@@ -88,7 +85,6 @@ describe('activity-routes.js', () => {
       .get(`/activity/${activity._id}`)
       .set('authorization', `Bearer ${token}`)
       .end(function(err, res) {
-        // console.log(activity)
         expect(res.status).to.equal(200)
         done()
       })
@@ -104,7 +100,7 @@ describe('activity-routes.js', () => {
         done()
       })
     })
-    it('should return 403 for a request with the wrong user token', function(done) {
+    it('should return 401 for a request with the wrong user token', function(done) {
       chai.request(app)
       .put(`/activity/${activity._id}`)
       .set('authorization', 'Bearer BADTOKEN')
@@ -133,7 +129,7 @@ describe('activity-routes.js', () => {
         done()
       })
     })
-    it('should return 200 for a request without a body', function(done) {
+    it('should return 400 for a request without a body', function(done) {
       chai.request(app)
       .put(`/activity/${activity._id}`)
       .set('authorization', `Bearer ${token}`)
@@ -152,7 +148,7 @@ describe('activity-routes.js', () => {
         done()
       })
     })
-    it('should return 403 for a request with the wrong user token', function(done) {
+    it('should return 401 for a request with the wrong user token', function(done) {
       chai.request(app)
       .del(`/activity/${activity._id}`)
       .set('Authorization', 'Bearer BADTOKEN')
