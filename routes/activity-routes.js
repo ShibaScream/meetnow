@@ -11,8 +11,9 @@ module.exports = function(router) {
     let dist = req.query.dist || 10000
     let lat = req.query.lat
     let lng = req.query.lng
+    let interestId = req.query.interest;
     // let activitiesWithin = []
-    if (dist && lat != undefined && lng != undefined) {
+    if (lat != undefined && lng != undefined) {
       let coords = [lng, lat]
       Activity
       .find({
@@ -31,6 +32,9 @@ module.exports = function(router) {
         // activitiesWithin = activities.filter(function(activity) {
         //   return distanceInMiles(activity.startLocation.coordinates[0], activity.startLocation.coordinates[1], lat, lng) < radius
         // })
+        if (interestId) {
+          activities = activities.filter(activity => activity.interest == interestId);
+        }
         res.json(activities)
       })
       .catch(next)
