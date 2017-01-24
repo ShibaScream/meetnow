@@ -68,7 +68,7 @@ module.exports = function(router) {
     Activity
       .findById(req.params.id)
       .then(activity => {
-        if(activity.host == req.authorizedUserId && Object.keys(activity).length > 0) {
+        if(activity.host.equals(req.authorizedUserId) && Object.keys(activity).length > 0) {
           activity
             .update(req.body)
             .save()
@@ -88,11 +88,13 @@ module.exports = function(router) {
     Activity
       .findById(req.params.id)
       .then(activity => {
-        if(activity.host == req.authorizedUserId) {
+        if(activity.host.equals(req.authorizedUserId) && Object.keys(activity).length > 0) {
           activity.remove(function(err) {
-            if(err) return next(createError(500, err.message))
+            if(err) return next(createError(404, err.message))
             res.status(202).end()
           })
+        } else {
+          return next(createError(404, 'Delete failed'))
         }
       })
       .catch(next)
