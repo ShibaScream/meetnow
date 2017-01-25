@@ -48,6 +48,7 @@ describe('activity-routes.js', () => {
       done()
     })
   })
+
   describe('/activity POST', function () {
     it('should return bad request for POST with no body', function(done) {
       chai.request(app)
@@ -99,12 +100,55 @@ describe('activity-routes.js', () => {
       .end(function(err, res) {
         expect(res.status).to.equal(200)
         expect(res.body.description).to.equal(activity.description)
-        expect(res.body.interest).to.equal(activity.interest)
-        expect(res.body.startLocation).to.deep.equal(activity.startLocation)
         expect(res.body.host).to.equal(activity.host)
         expect(res.body._id).to.equal(activity._id)
-        expect(res.body.startTime).to.equal(activity.startTime)
-        expect(res.body.participants).to.deep.equal(activity.participants)
+        done()
+      })
+    })
+  })
+  describe('/activity/search', function() {
+    it('should return 200 for a valid request', function(done) {
+      chai.request(app)
+      .get('/activity/search')
+      .query({ lat:47.6062, lng:122.3321})
+      .end(function(err, res) {
+        expect(res.status).to.equal(200)
+        expect(res.body).to.include(activity)
+        done()
+      })
+    })
+    it('should return 404 when no activities are found with the specified interest', function(done) {
+      chai.request(app)
+      .get('/activity/search')
+      .query({lat:47.6062, lng:122.3321, interest: '58881684c2e03d0f91f125a9'})
+      .end(function(err, res) {
+        expect(res.status).to.equal(404)
+        done()
+      })
+    })
+    it('should return 404 when no activities are found withing the search area', function(done) {
+      chai.request(app)
+      .get('/activity/search')
+      .query({dist:1, lat:1, lng:1})
+      .end(function(err, res) {
+        expect(res.status).to.equal(404)
+        done()
+      })
+    })
+    it('should return 400 if lat or lng is undefined', function(done) {
+      chai.request(app)
+      .get('/activity/search')
+      .query({lat:47.6062})
+      .end(function(err, res) {
+        expect(res.status).to.equal(400)
+        done()
+      })
+    })
+    it('should return 400 for a request without lat and lng values', function(done) {
+      chai.request(app)
+      .get('/activity/search')
+      .end(function(err, res) {
+        expect(res.status).to.equal(400)
         done()
       })
     })
@@ -155,56 +199,6 @@ describe('activity-routes.js', () => {
       .send(newActivityData)
       .end(function(err, res) {
         expect(res.status).to.equal(200)
-        console.log(res.body)
-        expect(res.body.description).to.equal(newActivityData.description)
-        done()
-      })
-    })
-  })
-  describe('/activity/search', function() {
-    it('should return 200 for a valid request', function(done) {
-      chai.request(app)
-      .get('/activity/search')
-      .query({ lat:47.6062, lng:122.3321})
-      .end(function(err, res) {
-        expect(res.status).to.equal(200)
-        expect(res.body).to.include(activity)
-        //might check to see if response does not include some activities
-        done()
-      })
-    })
-    it('should return 404 when no activities are found with the specified interest', function(done) {
-      chai.request(app)
-      .get('/activity/search')
-      .query({lat:47.6062, lng:122.3321, interest: '58881684c2e03d0f91f125a9'})
-      .end(function(err, res) {
-        expect(res.status).to.equal(404)
-        done()
-      })
-    })
-    it('should return 404 when no activities are found withing the search area', function(done) {
-      chai.request(app)
-      .get('/activity/search')
-      .query({dist:1, lat:1, lng:1})
-      .end(function(err, res) {
-        expect(res.status).to.equal(404)
-        done()
-      })
-    })
-    it('should return 400 if lat or lng is undefined', function(done) {
-      chai.request(app)
-      .get('/activity/search')
-      .query({lat:47.6062})
-      .end(function(err, res) {
-        expect(res.status).to.equal(400)
-        done()
-      })
-    })
-    it('should return 400 for a request without lat and lng values', function(done) {
-      chai.request(app)
-      .get('/activity/search')
-      .end(function(err, res) {
-        expect(res.status).to.equal(400)
         done()
       })
     })
