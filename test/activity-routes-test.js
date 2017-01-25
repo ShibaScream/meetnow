@@ -149,6 +149,15 @@ describe('activity-routes.js', () => {
         done()
       })
     })
+    it('should return 404 when no activities are found with the specified interest', function(done) {
+      chai.request(app)
+      .get('/activity/search')
+      .query({lat:47.6062, lng:122.3321, interest: '58881684c2e03d0f91f125a9'})
+      .end(function(err, res) {
+        expect(res.status).to.equal(404)
+        done()
+      })
+    })
     it('should return 404 when no activities are found withing the search area', function(done) {
       chai.request(app)
       .get('/activity/search')

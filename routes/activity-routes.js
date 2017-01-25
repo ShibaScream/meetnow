@@ -37,11 +37,13 @@ module.exports = function(router) {
         // activitiesWithin = activities.filter(function(activity) {
         //   return distanceInMiles(activity.startLocation.coordinates[0], activity.startLocation.coordinates[1], lat, lng) < radius
         // })
-        if(Object.keys(activities).length === 0) return next(createError(404, 'Not Found'))
-        
         if (interestId) {
           activities = activities.filter(activity => activity.interest == interestId);
+
         }
+
+        if(Object.keys(activities).length === 0) return next(createError(404, 'Not Found'))
+
         res.json(activities)
       })
       .catch(next)
