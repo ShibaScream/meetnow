@@ -51,28 +51,9 @@ module.exports = function(router) {
     .catch(next)
   })
 
-  router.get('/user/:userId', authMiddleware, function(req, res, next) {
-    User
-    .findById(req.params.userId || req.authorizedUserId)
-    .populate({
-      path: 'interests',
-      model: 'interest',
-      populate: {
-        path: 'category',
-        model: 'category'
-      }
-    })
-    .then(user => {
-      user.password = undefined
-      user.email = undefined
-      user.radius = undefined
-      //possibly make gender and other personal details optional to return
-      res.json(user)
-    })
-    .catch(next)
-  })
-
   router.get('/user/search', authMiddleware, function(req, res, next) {
+    console.log('hit')
+    debugger
     let lat = req.query.lat
     let lng = req.query.lng
     let interestId = req.query.interest
@@ -92,12 +73,33 @@ module.exports = function(router) {
     .catch(next)
   })
 
-  router.put('/user', authMiddleware, function(req, res, next) { //TODO add pre 'update' function to schema to hash password if password was updated
+  router.get('/user/:userId', authMiddleware, function(req, res, next) {
+    console.log('/user/:userID hit')
+    User
+    .findById(req.params.userId)
+    .populate({
+      path: 'interests',
+      model: 'interest',
+      populate: {
+        path: 'category',
+        model: 'category'
+      }
+    })
+    .then(user => {
+      user.password = undefined
+      user.email = undefined
+      user.radius = undefined
+      //possibly make gender and other personal details optional to return
+      res.json(user)
+    })
+    .catch(next)
+  })
+
+  router.put('/user', authMiddleware, function(req, res, next) {
     User
     .findByIdAndUpdate(req.authorizedUserId, { new: true }, req.body)
-    .then(function(err, user) {
-      if (err) return next(err)
-      delete user.password
+    .then(user => {
+      user.password = undefined
       res.json(user)
     })
     .catch(next)
@@ -106,8 +108,7 @@ module.exports = function(router) {
   router.delete('/user/:userId', authMiddleware, function(req, res, next) {
     User
     .findByIdAndRemove(req.params.userId)
-    .then(function(err) {
-      if (err) return next(err)
+    .then(() => {
       res.status(202)
       res.end()
     })

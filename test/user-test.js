@@ -19,6 +19,7 @@ let password = '1236pass'
 let user2 = 'sees.lots@test.com'
 let pass2 = '1235pass'
 let token = null
+let existingID = ''
 
 chai.use(chaiHttp)
 
@@ -57,30 +58,93 @@ describe('authentication app', function() {
         'interests': ['5886df9d3dfccb15c2f091cc']
       })
       .end(function(err, res) {
-        // console.log(res)
         expect(res).to.have.status(200)
-        // expect(res.body).to.not.be.array
-        // expect(res.body.username).to.equal(username)
+        existingID = res.body._id
         done()
       })
     })
   })
 
-  describe('GET /user', function() {
+  describe('GET /login', function() {
     it('should only return user\'s info for any user other than Admin', function(done) {
       chai
       .request(app)
       .get('/login')
       .auth(user2, pass2)
-      //.set('authorization', `Bearer ${token}`)
       .end(function(err, res) {
         expect(res).to.have.status(200)
         token = res.body.token
         expect(token).to.not.be.null
-        // expect(res.body).to.not.be.array
-        // expect(res.body.username).to.equal(username)
         done()
       })
     })
   })
+
+  describe('GET /user/:userId', function() {
+    it('should return a single user', function(done) {
+      chai
+      .request(app)
+      .get(`/user/${existingID}`)
+      .set('authorization', `Bearer ${token}`)
+      .end(function(err, res) {
+        expect(res).to.have.status(200)
+        done()
+      })
+    })
+  })
+
+  describe('Searching', function() {
+    it('should allow a user to search', function(done) {
+      chai
+      .request(app)
+      .get('/user/search')
+      .query({lng: 117.4260, lat: 47.6588})
+      .set('authorization', `Bearer ${token}`)
+      .end(function(err, res) {
+        console.log(err)
+        expect(res).to.have.status(200)
+        done()
+      })
+    })
+  })
+
+  describe('DELETE /user', function() {
+    it('should delete a user', function(done) {
+      chai
+      .request(app)
+      .delete('/user/58853b381bec7e61ead38906')
+      .set('authorization', `Bearer ${token}`)
+      .end(function(err, res) {
+        expect(res).to.have.status(202)
+        done()
+      })
+    })
+  })
+
+  describe('PUT /user', function() {
+    it('should update a user', function(done) {
+      chai
+      .request(app)
+      .put('/user')
+      .set('authorization', `Bearer ${token}`)
+      .end(function(err, res) {
+        expect(res).to.have.status(200)
+        done()
+      })
+    })
+  })
+
+  describe('DELETE /user', function() {
+    it('should delete a user', function(done) {
+      chai
+      .request(app)
+      .delete('/user/58853b381bec7e61ead38906')
+      .set('authorization', `Bearer ${token}`)
+      .end(function(err, res) {
+        expect(res).to.have.status(202)
+        done()
+      })
+    })
+  })
+
 })

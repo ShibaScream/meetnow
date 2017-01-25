@@ -18,10 +18,10 @@ const UserSchema = mongoose.Schema({
   radius: {type: Number, default: 3, required: true},
   gender: {
     type: String,
-    // validate: function(gender) {
-    //   const genderList = ['male', 'female', 'non-binary / third gender', 'prefer not to say']
-    //   return genderList.includes(gender.toLowerCase())
-    // }
+    validate: function(gender) {
+      const genderList = ['male', 'female', 'non-binary / third gender', 'prefer not to say']
+      return genderList.includes(gender.toLowerCase())
+    }
   },
   age: {type: Number},
   interests: [{
