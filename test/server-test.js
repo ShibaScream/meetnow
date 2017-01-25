@@ -1,11 +1,11 @@
 // 'use strict'
 //
-// const mongoose = require('mongoose');
+// const mongoose = require('mongoose')
 //
-// mongoose.Promise = global.Promise;
+// mongoose.Promise = global.Promise
 //
 // before((done) => {
-//   mongoose.connect('mongodb://localhost/meetnow');
+//   mongoose.connect('mongodb://localhost/meetnow')
 //   mongoose.connection
 //     .once('open', () => { done() })
 //     .on('error', (error) => {
@@ -14,10 +14,10 @@
 // })
 //
 // beforeEach((done) => {
-//   const { users, interests } = mongoose.connection.collections;
+//   const { users, interests } = mongoose.connection.collections
 //   users.drop(() => {
 //     interests.drop(() => {
-//       done();
+//       done()
 //     })
 //   })
 // })
