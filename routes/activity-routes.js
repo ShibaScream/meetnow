@@ -83,9 +83,10 @@ module.exports = function(router) {
         }
 
         if(activity.host.equals(req.authorizedUserId)) {
+          console.log('host is the same')
           activity
             .update(req.body)
-            .save()
+            // .save()
             .then(activity => {
               res.json(activity)
             })
