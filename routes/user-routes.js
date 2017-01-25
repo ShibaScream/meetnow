@@ -1,31 +1,28 @@
 'use strict'
 
-const parseAuth = require('basic-auth');
+const parseAuth = require('basic-auth')
 const createError = require('http-errors')
-const jsonWebToken = require('jsonwebtoken');
+const jsonWebToken = require('jsonwebtoken')
 
-jsonWebToken.KEY = process.env.JSON_TOKEN_KEY || 'abcdef';
-const TOKEN_EXPIRY_TIME = 60 * 60 * 24;
+jsonWebToken.KEY = process.env.JSON_TOKEN_KEY || 'abcdef'
+const TOKEN_EXPIRY_TIME = 60 * 60 * 24
 
-const authMiddleware = require('../lib/authMiddleware');
-const User = require('../model/user-model');
+const authMiddleware = require('../lib/authMiddleware')
+const User = require('../model/user-model')
 
 module.exports = function(router) {
   router.post('/user', function(req, res, next) {
     let user = new User(req.body)
-    user.save()
-    .then(user => {
-      res.json(user)
-    }).catch(next)
-    // new User(req.body).save().then(function(err, user) {
-    //   if (err) next(err);
-    //   delete user.password;
-    //   res.json(user);
-    // }).catch(next);
-  });
+    user
+      .save()
+      .then(user => {
+        res.json(user)
+      })
+      .catch(next)
+  })
 
   router.get('/login', function(req, res, next) {
-    let auth = parseAuth(req);
+    let auth = parseAuth(req)
     if (!auth) next(createError(403, 'Expected authorization header.'))
     User
       .findOne({ email: auth.name }, function (err, user) {
@@ -36,12 +33,12 @@ module.exports = function(router) {
             if (correct) {
               let token = jsonWebToken.sign(user, jsonWebToken.KEY, {
                 expiresIn: TOKEN_EXPIRY_TIME
-              });
+              })
 
               res.json({
                 token: token,
                 expiresIn: Date.now() + (TOKEN_EXPIRY_TIME * 1000)
-              });
+              })
             } else
               next(createError(403, 'Invalid credentials.'))
           })
@@ -68,36 +65,39 @@ module.exports = function(router) {
         res.json(user)
       })
       .catch(next)
-  });
+  })
 
   router.get('/user/search', authMiddleware, function(req, res, next) {
-    let lat = req.query.lat;
-    let lng = req.query.lng;
-    let interestId = req.query.interest;
+    let lat = req.query.lat
+    let lng = req.query.lng
+    let interestId = req.query.interest
     if (!lat || !lng)
-      return next(new Error('Expected lattitude and longitude.'));
-    User.find({ currentLocation: {
+      return next(new Error('Expected lattitude and longitude.'))
+    User
+    .find({ currentLocation: {
       $nearSphere: {
         $geometry: { type: 'Point', coordinates: [lng, lat] },
         $minDistance: 0,
         $maxDistance: req.authorizedUser.radius
       }
-    }}).then(activities => {
+    }})
+    .then(activities => {
       if (interestId)
-        activities = activities.filter(activity => activity.interest == interestId);
+        activities = activities.filter(activity => activity.interest == interestId)
       res.json(activities)
-    }).catch(next);
-  });
+    })
+    .catch(next)
+  })
 
   router.put('/user', authMiddleware, function(req, res, next) { //TODO add pre 'update' function to schema to hash password if password was updated
     User
       .findByIdAndUpdate(req.authorizedUserId, { new: true }, req.body)
       .then(function(err, user) {
         if (err) return next(err)
-        delete user.password;
-        res.json(user);
+        delete user.password
+        res.json(user)
       })
-      .catch(next);
+      .catch(next)
   })
 
   router.delete('/user/:userId', authMiddleware, function(req, res, next) {
@@ -105,9 +105,9 @@ module.exports = function(router) {
       .findByIdAndRemove(req.params.userId)
       .then(function(err) {
         if (err) return next(err)
-        res.status(202);
-        res.end();
+        res.status(202)
+        res.end()
       })
-      .catch(next);
-  });
-};
+      .catch(next)
+  })
+}
