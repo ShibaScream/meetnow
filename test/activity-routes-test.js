@@ -146,7 +146,15 @@ describe('activity-routes.js', () => {
       .query({ lat:47.6062, lng:122.3321})
       .end(function(err, res) {
         expect(res.status).to.equal(200)
-        console.log(res.text)
+        done()
+      })
+    })
+    it('should return 404 when no activities are found withing the search area', function(done) {
+      chai.request(app)
+      .get('/activity/search')
+      .query({dist:1, lat:1, lng:1})
+      .end(function(err, res) {
+        expect(res.status).to.equal(404)
         done()
       })
     })
