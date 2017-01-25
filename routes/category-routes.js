@@ -2,9 +2,11 @@
 
 const authMiddleware = require('../lib/authMiddleware')
 const Category = require('../model/category-model')
+const createError = require('http-errors')
 
 module.exports = function(router) {
   router.post('/category', authMiddleware, function(req, res, next) {
+    if (Object.keys(req.body).length === 0) return next(createError(400, 'No data included in POST request'))
     new Category(req.body)
       .save()
       .then(function(category) {
@@ -16,8 +18,9 @@ module.exports = function(router) {
   router.get('/categories', function(req, res, next) {
     Category
       .find({})
+      .populate('interests')
       .then(function(categories) {
-        res.json(categories.map((category) => category._id))
+        res.json(categories)
       })
       .catch(next)
   })
@@ -26,6 +29,7 @@ module.exports = function(router) {
     Category
       .findById(req.params.id)
       .then(function(category) {
+        if (category == null) return next(createError(404, 'Interest not found'))
         res.json(category)
       })
       .catch(next)
@@ -35,7 +39,7 @@ module.exports = function(router) {
     Category
       .findByIdAndRemove(req.params.id)
       .then(function() {
-        res.status(202)
+        res.status(202).end()
       })
       .catch(next)
   })
