@@ -167,6 +167,15 @@ describe('activity-routes.js', () => {
         done()
       })
     })
+    it('should return 400 if lat or lng is undefined', function(done) {
+      chai.request(app)
+      .get('/activity/search')
+      .query({lat:47.6062})
+      .end(function(err, res) {
+        expect(res.status).to.equal(400)
+        done()
+      })
+    })
     it('should return 400 for a request without lat and lng values', function(done) {
       chai.request(app)
       .get('/activity/search')
