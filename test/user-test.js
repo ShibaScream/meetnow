@@ -1,7 +1,7 @@
 // 'use strict'
 //
-// const assert = require('assert');
-// const User = require('../model/user-model');
+// const assert = require('assert')
+// const User = require('../model/user-model')
 //
 // describe('Creating user records', () => {
 //   it('Saves a user', (done) => {
@@ -12,7 +12,7 @@
 //     })
 //     david.save()
 //     .then(() => {
-//       assert(!david.isNew);
+//       assert(!david.isNew)
 //       done()
 //     })
 //   })
