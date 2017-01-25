@@ -40,6 +40,9 @@ module.exports = function(router) {
         if (interestId) {
           activities = activities.filter(activity => activity.interest == interestId)
         }
+
+        if(Object.keys(activities).length === 0) return next(createError(404, 'Not Found'))
+
         res.json(activities)
       })
       .catch(next)
@@ -79,9 +82,10 @@ module.exports = function(router) {
         }
 
         if(activity.host.equals(req.authorizedUserId)) {
+          console.log('host is the same')
           activity
             .update(req.body)
-            .save()
+            // .save()
             .then(activity => {
               res.json(activity)
             })
