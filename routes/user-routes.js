@@ -3,6 +3,9 @@
 const parseAuth = require('basic-auth')
 const createError = require('http-errors')
 const jsonWebToken = require('jsonwebtoken')
+const sendMail = require('sendmail');
+
+const twoFactor = require('../lib/twofactor')
 
 jsonWebToken.KEY = process.env.JSON_TOKEN_KEY || 'abcdef'
 const TOKEN_EXPIRY_TIME = 60 * 60 * 24
@@ -31,6 +34,29 @@ module.exports = function(router) {
           .checkPass(auth.pass, (err, correct) => {
             if (err) return next(err)
             if (correct) {
+
+              if (user.twoFactorEnabled) {
+                if (twoFactor.hasPendingKey(user._id)) {
+                  if (!twoFactor.isValid(user._id, req.get('TwoFactorKey'))) {
+                    return next(createError(403, 'Invalid two factor authentication key.'));
+                  }
+                } else {
+                  sendMail({
+                    from: 'trenton.kress@gmail.com',
+                    to: user.email,
+                    replyTo: 'trenton.kress@gmail.com',
+                    subject: 'MeetNow Login Request',
+                    html: 'Someone tried logging into your MeetNow user.' +
+                          'To verify this was you, please use this code in your ' +
+                          'TwoFactorKey header in the next 20 minutes.<br><br> ' +
+                          'Your key: ' + twoFactor.createKey(user._id, 20).key;
+                  }, function (err, reply) {
+                    if (err) console.error(err);
+                  });
+                  return next(createError(403, 'Two factor authentication key sent to your email.'));
+                }
+              }
+
               let token = jsonWebToken.sign(user, jsonWebToken.KEY, {
                 expiresIn: TOKEN_EXPIRY_TIME
               })
