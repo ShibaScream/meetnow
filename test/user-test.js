@@ -8,8 +8,6 @@ const chai = require('chai')
 const expect = chai.expect
 const chaiHttp = require('chai-http')
 
-//const User = require('../model/user-model')
-
 chai.use(chaiHttp)
 
 let server = null
@@ -34,7 +32,7 @@ describe('authentication app', function() {
 
   after(function(done) {
     server.close(function() {
-      console.log('server closed');
+      console.log('server closed')
       done()
     })
   })
@@ -146,5 +144,4 @@ describe('authentication app', function() {
       })
     })
   })
-
 })

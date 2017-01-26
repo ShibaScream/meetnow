@@ -58,7 +58,7 @@ module.exports = function(router) {
     let lng = req.query.lng
     let interestId = req.query.interest
     if (!lat || !lng)
-      return next(new Error('Expected lattitude and longitude.'))
+    return next(new Error('Expected lattitude and longitude.'))
     User.find({ currentLocation: {
       $nearSphere: {
         $geometry: { type: 'Point', coordinates: [lng, lat] },
@@ -67,7 +67,7 @@ module.exports = function(router) {
       }
     }}).then(activities => {
       if (interestId)
-        activities = activities.filter(activity => activity.interest == interestId)
+      activities = activities.filter(activity => activity.interest == interestId)
       res.json(activities)
     })
     .catch(next)

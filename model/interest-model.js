@@ -3,10 +3,11 @@
 const mongoose = require('mongoose')
 
 const InterestSchema = mongoose.Schema({
-  name: {type: String, required: true},
+  name: {type: String, unique: true, required: true},
   category: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'category'
+    ref: 'category',
+    required: true
   },
   users: [{
     type: mongoose.Schema.Types.ObjectId,
