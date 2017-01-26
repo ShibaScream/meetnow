@@ -15,6 +15,7 @@ const UserSchema = mongoose.Schema({
   email: {type: String, required: true, unique: true},
   currentLocation: mongoose.Schema.Types.Point,
   lastLoginTime: {type: Date},
+  twoFactorEnabled: {type: Boolean, default: false},
   radius: {type: Number, default: 3, required: true},
   gender: {
     type: String,
