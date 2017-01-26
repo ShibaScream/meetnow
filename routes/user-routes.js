@@ -3,7 +3,7 @@
 const parseAuth = require('basic-auth')
 const createError = require('http-errors')
 const jsonWebToken = require('jsonwebtoken')
-const sendMail = require('sendmail');
+const sendMail = require('sendmail')();
 
 const twoFactor = require('../lib/twofactor')
 
@@ -49,9 +49,10 @@ module.exports = function(router) {
                     html: 'Someone tried logging into your MeetNow user.' +
                           'To verify this was you, please use this code in your ' +
                           'TwoFactorKey header in the next 20 minutes.<br><br> ' +
-                          'Your key: ' + twoFactor.createKey(user._id, 20).key;
+                          'Your key: ' + twoFactor.createKey(user._id, 20).key
                   }, function (err, reply) {
                     if (err) console.error(err);
+                    console.log(reply);
                   });
                   return next(createError(403, 'Two factor authentication key sent to your email.'));
                 }
