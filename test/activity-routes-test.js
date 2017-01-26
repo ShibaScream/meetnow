@@ -203,6 +203,28 @@ describe('activity-routes.js', () => {
       })
     })
   })
+  ////////////////////////////////////////////////////////////////////////////
+  describe('/activity/join', function() {
+    it('should return 400 when no body is provided', function(done) {
+      chai.request(app)
+      .post('/activity/join')
+      .set('authorization', `Bearer ${token}`)
+      .end(function(err, res) {
+        expect(res.status).to.equal(400)
+        done()
+      })
+    })
+  })
+  it('should add a user to the participants', function(done) {
+    chai.request(app)
+    .post('/activity/join')
+    .set('authorization', `Bearer ${token}`)
+    .send({id: activity._id)
+    .end(function(err, res) {
+      expect(res.status).to.equal(200)
+      done()
+    })
+  })
   describe('/activity/:id DELETE', function() {
     it('should return 401 unauthorized for request without a token', function(done) {
       chai.request(app)

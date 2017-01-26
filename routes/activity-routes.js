@@ -48,11 +48,27 @@ module.exports = function(router) {
       .catch(next)
   })
 
+  router.post('/activity/join', authMiddleware, function(req, res, next) {
+    if (Object.keys(req.body).length === 0) return next(createError(400, 'No data included in POST request'))
+    Activity
+    .findbyId(req.body.id)
+    .then(activity => {
+      activity.participants
+      .push(req.authorizedUserId)
+      .save()
+      .then(activity => {
+        if(Object.keys(activity).length === 0) return next(createError(404, 'Not Found'))
+        res.json(activity)
+      })
+      .catch(next)
+    })
+    .catch(next)
+  })
+
   router.post('/activity', authMiddleware, function(req, res, next) {
     if (Object.keys(req.body).length === 0) return next(createError(400, 'No data included in POST request'))
     let body = req.body
     body.host = req.authorizedUserId
-    // console.log(body)
     new Activity(body)
       .save()
       .then(activity => {
@@ -80,6 +96,21 @@ module.exports = function(router) {
         if (activity == null) {
           return next(createError(404, 'Activity not found'))
         }
+///////////////////////////////////////////////
+
+      //   if(req.body.join === true) {
+      //     console.log('join activity')
+      //     activity.participants
+      //     .push(req.authorizedUserId)
+      //     activity.save()
+      //     .then(activity => {
+      //       console.log(activity)
+      //       res.json(activity)
+      //       return
+      //     })
+      //     .catch(next)
+      //   activity
+      // }
 
         if(activity.host.equals(req.authorizedUserId)) {
           console.log('host is the same')
