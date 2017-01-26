@@ -3,7 +3,7 @@
 const parseAuth = require('basic-auth')
 const createError = require('http-errors')
 const jsonWebToken = require('jsonwebtoken')
-const sendMail = require('sendmail')();
+const sendMail = require('sendmail')()
 
 const twoFactor = require('../lib/twofactor')
 
@@ -38,7 +38,7 @@ module.exports = function(router) {
               if (user.twoFactorEnabled) {
                 if (twoFactor.hasPendingKey(user._id)) {
                   if (!twoFactor.isValid(user._id, req.get('TwoFactorKey'))) {
-                    return next(createError(403, 'Invalid two factor authentication key.'));
+                    return next(createError(403, 'Invalid two factor authentication key.'))
                   }
                 } else {
                   sendMail({
@@ -51,10 +51,10 @@ module.exports = function(router) {
                           'TwoFactorKey header in the next 20 minutes.<br><br> ' +
                           'Your key: ' + twoFactor.createKey(user._id, 20).key
                   }, function (err, reply) {
-                    if (err) console.error(err);
-                    console.log(reply);
-                  });
-                  return next(createError(403, 'Two factor authentication key sent to your email.'));
+                    if (err) console.error(err)
+                    console.log(reply)
+                  })
+                  return next(createError(403, 'Two factor authentication key sent to your email.'))
                 }
               }
 
@@ -71,6 +71,30 @@ module.exports = function(router) {
           })
       })
       .catch(next)
+  })
+
+  router.get('/user/search', authMiddleware, function(req, res, next) {
+    let lat = req.query.lat
+    let lng = req.query.lng
+    let interestId = req.query.interest
+    if (!lat || !lng) {
+      return next(createError('Expected latitude and longitude.'))
+    }
+    User
+    .find({ currentLocation: {
+      $nearSphere: {
+        $geometry: { type: 'Point', coordinates: [lng, lat] },
+        $minDistance: 0,
+        $maxDistance: req.authorizedUser.radius
+      }
+    }})
+    .then(activities => {
+      if (interestId) {
+        activities = activities.filter(activity => activity.interest == interestId)
+      }
+      res.json(activities)
+    })
+    .catch(next)
   })
 
   router.get('/user/:userId', authMiddleware, function(req, res, next) {
@@ -94,34 +118,13 @@ module.exports = function(router) {
       .catch(next)
   })
 
-  router.get('/user/search', authMiddleware, function(req, res, next) {
-    let lat = req.query.lat
-    let lng = req.query.lng
-    let interestId = req.query.interest
-    if (!lat || !lng)
-      return next(new Error('Expected lattitude and longitude.'))
-    User
-    .find({ currentLocation: {
-      $nearSphere: {
-        $geometry: { type: 'Point', coordinates: [lng, lat] },
-        $minDistance: 0,
-        $maxDistance: req.authorizedUser.radius
-      }
-    }})
-    .then(activities => {
-      if (interestId)
-        activities = activities.filter(activity => activity.interest == interestId)
-      res.json(activities)
-    })
-    .catch(next)
-  })
 
-  router.put('/user', authMiddleware, function(req, res, next) { //TODO add pre 'update' function to schema to hash password if password was updated
+  router.put('/user', authMiddleware, function(req, res, next) {
+    if (Object.keys(req.body).length === 0) return next(createError(400, 'No data included in PUT request'))
     User
       .findByIdAndUpdate(req.authorizedUserId, { new: true }, req.body)
-      .then(function(err, user) {
-        if (err) return next(err)
-        delete user.password
+      .then(user => {
+        user.password = undefined
         res.json(user)
       })
       .catch(next)
@@ -138,4 +141,3 @@ module.exports = function(router) {
       .catch(next)
   })
 }
-

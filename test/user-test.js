@@ -125,8 +125,20 @@ describe('authentication app', function() {
       .request(app)
       .put('/user')
       .set('authorization', `Bearer ${token}`)
+      .send({email: 'newEmail@test.com'})
       .end(function(err, res) {
         expect(res).to.have.status(200)
+        done()
+      })
+    })
+
+    it('should fail if sent empty body', function(done) {
+      chai
+      .request(app)
+      .put('/user')
+      .set('authorization', `Bearer ${token}`)
+      .end(function(err, res) {
+        expect(res).to.have.status(400)
         done()
       })
     })
