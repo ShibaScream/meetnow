@@ -3,23 +3,32 @@
 const Activity = require('../model/activity-model')
 
 module.exports.seedActivities = function(users) {
-  console.log(users)
   let activities = [
     {
-      description: 'test',
+      description: 'testOne',
       interest: 'Run',
-      host: 'user objectId',
-      startLocation: 'user currnet location'
+      host: 'Far Away',
+      startLocation: 'user currentLocationt location'
+    },
+    {
+      description: 'testTwo',
+      interest: 'Run',
+      host: 'Runs More',
+      startLocation: 'user currentLocationt location'
+    },
+    {
+      description: 'testThree',
+      interest: 'Run',
+      host: 'Sees Lots',
+      startLocation: 'user currentLocationt location'
     }
   ]
 
   activities = activities.map(activity => {
-    activity.interest = users.interests[0]
-    // activity.host = users[users.name.findIndex(_findHostName, activity.host)]._id
-    // activity.interest = users.interests.findIndex(_findInterestName, activity.interest)._id
-    activity.host = users._id
-    activity.startLocation = users.currentLocation
-    console.log(activity)
+    let host = users.findIndex(_findHostName, activity.host)
+    activity.host = users[users.findIndex(_findHostName, activity.host)]._id
+    activity.interest = users[host].interests[0]
+    activity.startLocation = users[host].currentLocation
     return activity
   })
 
@@ -33,13 +42,7 @@ module.exports.seedActivities = function(users) {
     .catch(reject)
   })
 
-  // function _findHostName(users){
-  //   console.log(users.name)
-  //   return users.name === this
-  // }
-
-  // function _findInterestName(interest) {
-  //   console.log(interest.name)
-  //   return interest.name === this
-  // }
+  function _findHostName(users){
+    return users.name === this
+  }
 }
