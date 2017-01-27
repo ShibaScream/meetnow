@@ -66,7 +66,9 @@ module.exports.seedUsers = function (interests) {
               createdUser.interests.forEach(interest => {
                 interests[interests.findIndex(_findInterestID, interest)].users.addToSet(createdUser._id)
               })
+              
               createdUser.save().catch(err => console.error(err))
+
             })
             // .catch(err => console.error(err))
             interests.forEach(i => i.save().catch(err => console.error(err)))

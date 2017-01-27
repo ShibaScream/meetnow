@@ -48,11 +48,30 @@ module.exports = function(router) {
       .catch(next)
   })
 
+  router.post('/activity/join', authMiddleware, function(req, res, next) {
+    console.log(req.body._id)
+    if (Object.keys(req.body).length === 0) return next(createError(400, 'No data included in POST request'))
+    Activity
+    .findById(req.body.id)
+    .then(activity => {
+      if(Object.keys(activity).length === 0) return next(createError(404, 'Not Found'))
+      activity.participants
+      .push(req.authorizedUserId)
+
+      activity
+      .save()
+      .then(activity => {
+        res.json(activity)
+      })
+      .catch(next)
+    })
+    .catch(next)
+  })
+
   router.post('/activity', authMiddleware, function(req, res, next) {
     if (Object.keys(req.body).length === 0) return next(createError(400, 'No data included in POST request'))
     let body = req.body
     body.host = req.authorizedUserId
-    // console.log(body)
     new Activity(body)
       .save()
       .then(activity => {
