@@ -27,11 +27,8 @@ describe('activity-routes.js', () => {
   before(done => {
     server = app.listen(3000, function() {
       console.log('server up')
-      Activity.findOne({description: 'testOne'})
-      .then(act => {
-        activityTwo = act
-      })
-      chai.request(app)
+      chai
+      .request(app)
       .get('/login')
       .auth('runs.more@test.com', '1234pass')
       .end(function(err, res) {
@@ -41,6 +38,7 @@ describe('activity-routes.js', () => {
       })
     })
   })
+  
   after(function(done) {
     server.close(function() {
       console.log('server closed')
@@ -105,6 +103,7 @@ describe('activity-routes.js', () => {
   })
   describe('/activity/search', function() {
     it('should return 200 for a valid request', function(done) {
+      activity.nearbyUsers = []
       chai.request(app)
       .get('/activity/search')
       .query({ lat:47.6062, lng:122.3321})
@@ -213,14 +212,19 @@ describe('activity-routes.js', () => {
     })
   })
   it('should add a user to the participants', function(done) {
-    chai.request(app)
-    .post('/activity/join')
-    .set('authorization', `Bearer ${token}`)
-    .send({id: activityTwo._id})
-    .end(function(err, res) {
-      expect(res.status).to.equal(200)
-      done()
-    })
+    Activity
+      .findOne({description: 'testOne'})
+      .then(act => {
+        console.log(act)
+        chai.request(app)
+          .post('/activity/join')
+          .set('authorization', `Bearer ${token}`)
+          .send({id: act._id})
+          .end(function(err, res) {
+            expect(res.status).to.equal(200)
+            done()
+          })
+      })
   })
   describe('/activity/:id DELETE', function() {
     it('should return 401 unauthorized for request without a token', function(done) {
