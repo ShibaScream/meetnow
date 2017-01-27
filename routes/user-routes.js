@@ -3,7 +3,7 @@
 const parseAuth = require('basic-auth')
 const createError = require('http-errors')
 const jsonWebToken = require('jsonwebtoken')
-const sendMail = require('sendmail')();
+const sendMail = require('sendmail')()
 
 const twoFactor = require('../lib/twofactor')
 
@@ -38,7 +38,7 @@ module.exports = function(router) {
               if (user.twoFactorEnabled) {
                 if (twoFactor.hasPendingKey(user._id)) {
                   if (!twoFactor.isValid(user._id, req.get('TwoFactorKey'))) {
-                    return next(createError(403, 'Invalid two factor authentication key.'));
+                    return next(createError(403, 'Invalid two factor authentication key.'))
                   }
                 } else {
                   sendMail({
@@ -51,10 +51,10 @@ module.exports = function(router) {
                           'TwoFactorKey header in the next 20 minutes.<br><br> ' +
                           'Your key: ' + twoFactor.createKey(user._id, 20).key
                   }, function (err, reply) {
-                    if (err) console.error(err);
-                    console.log(reply);
-                  });
-                  return next(createError(403, 'Two factor authentication key sent to your email.'));
+                    if (err) console.error(err)
+                    console.log(reply)
+                  })
+                  return next(createError(403, 'Two factor authentication key sent to your email.'))
                 }
               }
 
@@ -138,4 +138,3 @@ module.exports = function(router) {
       .catch(next)
   })
 }
-
