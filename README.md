@@ -1,5 +1,5 @@
 # MeetNow
-(meetnow description/pitch here)
+MeetNow began as a social running/cycling app that would all runners to find other runners in a specified radius, running at specific paces, distances, intervals, and other criteria. The idea evolved into a general platform to allow anyone to find anyone that matched specific criteria as well as host and join an event. This could eventually be open-sourced to serve as the basis to create an infinite number of products that require geolocation data as well as allowing for any number of filters/extends.  
 
 ## Dependencies
 
@@ -80,7 +80,11 @@ If the code is correct, then it returns the same response as described above wit
 You won't have to use two factor authentication again for as long as the key lasts. This means every new device will required
 your two factor code to login with.
 
+### Data Model
+![Data Model](https://github.com/ShibaScream/meetnow/blob/master/visual-schemas.png "Data Model")
+
 ### User Endpoints (Authenticated)
+![Routes](https://github.com/ShibaScream/meetnow/blob/master/visual-routes.png "Routes")
 You can use these endpoints to modify/retrieve User, Activity, Interest, or Category data so long as you have the permissions.
 
 To get data about your user profile, send a GET request to /user with using a Bearer Auth header.

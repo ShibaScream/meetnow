@@ -3,7 +3,6 @@ const chai = require('chai')
 const expect = require('chai').expect
 const chaiHttp = require('chai-http')
 const app = require('../index.js')
-const User = require('../model/user-model.js')
 const Activity = require('../model/activity-model.js')
 let server = null
 
@@ -19,8 +18,8 @@ const activityData = {
   }
 }
 const newActivityData = { description: 'new description text'}
-let testUser = null
 let activity = null
+let activityTwo = null
 let token = null
 chai.use(chaiHttp)
 
@@ -28,9 +27,9 @@ describe('activity-routes.js', () => {
   before(done => {
     server = app.listen(3000, function() {
       console.log('server up')
-      User.findOne({name: 'Runs More'})
-      .then(user => {
-        testUser = user
+      Activity.findOne({description: 'testOne'})
+      .then(act => {
+        activityTwo = act
       })
       chai.request(app)
       .get('/login')
@@ -77,8 +76,6 @@ describe('activity-routes.js', () => {
         expect(res.status).to.equal(200)
         expect(res.body.description).to.equal(activityData.description)
         expect(res.body.interest).to.equal(activityData.interest)
-        expect(res.body.startLocation.coordinates).to.deep.equal(activityData.startLocation.coordinates)
-        expect(res.body.host).to.equal(testUser._id.toString())
         activity = res.body
         done()
       })
@@ -201,6 +198,28 @@ describe('activity-routes.js', () => {
         expect(res.status).to.equal(200)
         done()
       })
+    })
+  })
+
+  describe('/activity/join', function() {
+    it('should return 400 when no body is provided', function(done) {
+      chai.request(app)
+      .post('/activity/join')
+      .set('authorization', `Bearer ${token}`)
+      .end(function(err, res) {
+        expect(res.status).to.equal(400)
+        done()
+      })
+    })
+  })
+  it('should add a user to the participants', function(done) {
+    chai.request(app)
+    .post('/activity/join')
+    .set('authorization', `Bearer ${token}`)
+    .send({id: activityTwo._id})
+    .end(function(err, res) {
+      expect(res.status).to.equal(200)
+      done()
     })
   })
   describe('/activity/:id DELETE', function() {
