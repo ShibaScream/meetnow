@@ -109,6 +109,7 @@ module.exports = function(router) {
         }
       })
       .then(user => {
+        if (user == null) return next(createError(404, 'User not found'))
         user.password = undefined
         user.email = undefined
         user.radius = undefined

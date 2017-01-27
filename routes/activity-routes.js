@@ -2,6 +2,7 @@
 
 const authMiddleware = require('../lib/authMiddleware')
 const Activity = require('../model/activity-model')
+const User = require('../model/user-model')
 const createError = require('http-errors')
 
 // const MILES_PER_DEG = 55.2428
@@ -56,7 +57,24 @@ module.exports = function(router) {
     new Activity(body)
       .save()
       .then(activity => {
-        res.json(activity)
+        User
+          .find({
+            currentLocation: {
+              $nearSphere: {
+                $geometry: activity.startLocation,
+                $minDistance: 0,
+                $maxDistance: req.authorizedUser.radius * 1000
+              }
+            }
+          })
+          .select('-password -email -twoFactorEnabled -radius -__v -currentLocation')
+          .populate('interests', 'name')
+          .lean()
+          .then(result => {
+            activity.set('nearbyUsers', result, { strict: false })
+            res.json(activity)
+          })
+          .catch(next)
       })
       .catch(next)
   })
