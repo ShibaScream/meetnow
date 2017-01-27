@@ -64,7 +64,8 @@ module.exports = function(router) {
 
               res.json({
                 token: token,
-                expiresIn: Date.now() + (TOKEN_EXPIRY_TIME * 1000)
+                expiresIn: Date.now() + (TOKEN_EXPIRY_TIME * 1000),
+                user: user
               })
             } else
               next(createError(403, 'Invalid credentials.'))
