@@ -3,7 +3,6 @@ const chai = require('chai')
 const expect = require('chai').expect
 const chaiHttp = require('chai-http')
 const app = require('../index.js')
-const User = require('../model/user-model.js')
 const Activity = require('../model/activity-model.js')
 let server = null
 
@@ -19,7 +18,6 @@ const activityData = {
   }
 }
 const newActivityData = { description: 'new description text'}
-let testUser = null
 let activity = null
 let activityTwo = null
 let token = null
@@ -29,13 +27,9 @@ describe('activity-routes.js', () => {
   before(done => {
     server = app.listen(3000, function() {
       console.log('server up')
-      User.findOne({name: 'Runs More'})
-      .then(user => {
-        testUser = user
-        Activity.findOne({description: 'test'})
-        .then(act => {
-          activityTwo = act
-        })
+      Activity.findOne({description: 'testOne'})
+      .then(act => {
+        activityTwo = act
       })
       chai.request(app)
       .get('/login')
@@ -82,8 +76,6 @@ describe('activity-routes.js', () => {
         expect(res.status).to.equal(200)
         expect(res.body.description).to.equal(activityData.description)
         expect(res.body.interest).to.equal(activityData.interest)
-        expect(res.body.startLocation.coordinates).to.deep.equal(activityData.startLocation.coordinates)
-        expect(res.body.host).to.equal(testUser._id.toString())
         activity = res.body
         done()
       })
@@ -219,17 +211,6 @@ describe('activity-routes.js', () => {
         done()
       })
     })
-  })
-  it('should return 404 when trying to join an activity that does not exist', function(done) {
-    chai.request(app)
-    .post('/activity/join')
-    .set('authorization', `Bearer ${token}`)
-    .send({id: '58856046fd98115467e5f7a0'})
-    .end(function(err, res) {
-      expect(res.status).to.equal(404)
-      done()
-    })
-
   })
   it('should add a user to the participants', function(done) {
     chai.request(app)
