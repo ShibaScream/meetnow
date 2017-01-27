@@ -51,13 +51,15 @@ module.exports = function(router) {
   router.post('/activity/join', authMiddleware, function(req, res, next) {
     if (Object.keys(req.body).length === 0) return next(createError(400, 'No data included in POST request'))
     Activity
-    .findbyId(req.body.id)
+    .findById(req.body.id)
     .then(activity => {
+      if(Object.keys(activity).length === 0) return next(createError(404, 'Not Found'))
       activity.participants
       .push(req.authorizedUserId)
+
+      activity
       .save()
       .then(activity => {
-        if(Object.keys(activity).length === 0) return next(createError(404, 'Not Found'))
         res.json(activity)
       })
       .catch(next)
@@ -96,21 +98,6 @@ module.exports = function(router) {
         if (activity == null) {
           return next(createError(404, 'Activity not found'))
         }
-///////////////////////////////////////////////
-
-      //   if(req.body.join === true) {
-      //     console.log('join activity')
-      //     activity.participants
-      //     .push(req.authorizedUserId)
-      //     activity.save()
-      //     .then(activity => {
-      //       console.log(activity)
-      //       res.json(activity)
-      //       return
-      //     })
-      //     .catch(next)
-      //   activity
-      // }
 
         if(activity.host.equals(req.authorizedUserId)) {
           console.log('host is the same')

@@ -15,6 +15,7 @@ const bodyParser = require('body-parser')
 const categorySeeds = require('./seeds/categorySeeds')
 const interestSeeds = require('./seeds/interestSeeds')
 const userSeeds = require('./seeds/userSeeds')
+const activitySeeds = require('./seeds/activitySeeds')
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -45,6 +46,11 @@ mongoose
           .then(interests => {
             userSeeds
               .seedUsers(interests)
+              .then(users => {
+                activitySeeds
+                .seedActivities(users)
+                .catch(err => console.error(err))
+              })
               .catch(err => console.error(err))
           })
           .catch(err => console.error(err))

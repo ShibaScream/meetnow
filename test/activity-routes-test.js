@@ -21,6 +21,7 @@ const activityData = {
 const newActivityData = { description: 'new description text'}
 let testUser = null
 let activity = null
+let activityTwo = null
 let token = null
 chai.use(chaiHttp)
 
@@ -31,6 +32,10 @@ describe('activity-routes.js', () => {
       User.findOne({name: 'Runs More'})
       .then(user => {
         testUser = user
+        Activity.findOne({description: 'test'})
+        .then(act => {
+          activityTwo = act
+        })
       })
       chai.request(app)
       .get('/login')
@@ -203,7 +208,7 @@ describe('activity-routes.js', () => {
       })
     })
   })
-  ////////////////////////////////////////////////////////////////////////////
+
   describe('/activity/join', function() {
     it('should return 400 when no body is provided', function(done) {
       chai.request(app)
@@ -219,8 +224,11 @@ describe('activity-routes.js', () => {
     chai.request(app)
     .post('/activity/join')
     .set('authorization', `Bearer ${token}`)
-    .send({id: activity._id)
+    .send({id: activityTwo._id})
     .end(function(err, res) {
+      if(err) {
+        console.log(err)
+      }
       expect(res.status).to.equal(200)
       done()
     })
