@@ -1,5 +1,5 @@
 # MeetNow
-(meetnow description/pitch here)
+MeetNow began as a social running/cycling app that would all runners to find other runners in a specified radius, running at specific paces, distances, intervals, and other criteria. The idea evolved into a general platform to allow anyone to find anyone that matched specific criteria as well as host and join an event. This could eventually be open-sourced to serve as the basis to create an infinite number of products that require geolocation data as well as allowing for any number of filters/extends.  
 
 ## Dependencies
 
