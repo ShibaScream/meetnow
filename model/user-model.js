@@ -38,7 +38,7 @@ const UserSchema = mongoose.Schema({
 UserSchema.index({ currentLocation : '2dsphere' })
 
 function hashPass (next) {
-  if (!this.isModified('password'))
+  if (!this.isDirectModified('password'))
     return next()
   bcrypt.genSalt(10, (err, salt) => {
     if (err) return next(err)
@@ -50,7 +50,19 @@ function hashPass (next) {
   })
 }
 
-UserSchema.methods.hashPass = hashPass
+// UserSchema.methods.hashPassPromised = function () {
+//   return new Promise((resolve, reject) => {
+//     if (this.isDirectModified('password')) {
+//       return resolve(this)
+//     }
+//     bcrypt.hash(this.password, 10, (err, hash) => {
+//       if (err) return reject(err)
+//       this.password = hash
+//       resolve(this)
+//     })
+//   })
+// }
+
 UserSchema.pre('save', hashPass)
 UserSchema.pre('update', hashPass)
 
