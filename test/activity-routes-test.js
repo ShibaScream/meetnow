@@ -220,15 +220,23 @@ describe('activity-routes.js', () => {
       })
     })
   })
+  it('should return 404 when trying to join an activity that does not exist', function(done) {
+    chai.request(app)
+    .post('/activity/join')
+    .set('authorization', `Bearer ${token}`)
+    .send({id: '58856046fd98115467e5f7a0'})
+    .end(function(err, res) {
+      expect(res.status).to.equal(404)
+      done()
+    })
+
+  })
   it('should add a user to the participants', function(done) {
     chai.request(app)
     .post('/activity/join')
     .set('authorization', `Bearer ${token}`)
     .send({id: activityTwo._id})
     .end(function(err, res) {
-      if(err) {
-        console.log(err)
-      }
       expect(res.status).to.equal(200)
       done()
     })

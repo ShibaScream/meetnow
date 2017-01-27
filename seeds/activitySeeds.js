@@ -14,7 +14,6 @@ module.exports.seedActivities = function(users) {
   ]
 
   activities = activities.map(activity => {
-    console.log('users id is here>???????????????????????? ' + users._id)
     activity.interest = users.interests[0]
     // activity.host = users[users.name.findIndex(_findHostName, activity.host)]._id
     // activity.interest = users.interests.findIndex(_findInterestName, activity.interest)._id

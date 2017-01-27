@@ -59,18 +59,22 @@ module.exports.seedUsers = function (interests) {
     User
       .remove({})
       .then(() => {
-        users.forEach(user => {
-          User
-            .create(user)
-            .then(createdUser => {
+        User
+          .insertMany(users)
+          .then(createdUsers => {
+            createdUsers.forEach(createdUser => {
               createdUser.interests.forEach(interest => {
                 interests[interests.findIndex(_findInterestID, interest)].users.addToSet(createdUser._id)
               })
-              interests.forEach(i => i.save().catch(err => console.error(err)))
-              resolve(createdUser)
+              
+              createdUser.save().catch(err => console.error(err))
+
             })
-            .catch(reject)
-        })
+            // .catch(err => console.error(err))
+            interests.forEach(i => i.save().catch(err => console.error(err)))
+            resolve(createdUsers)
+          })
+          .catch(err => console.error(err))
       })
       .catch(reject)
   })
