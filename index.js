@@ -9,6 +9,7 @@ const router = Express.Router()
 const app = Express()
 
 //UTILITY MODULES
+// const createError = require('http-errors')
 const bodyParser = require('body-parser')
 
 // SEEDS
@@ -26,6 +27,7 @@ require('./routes/activity-routes')(router)
 require('./routes/interest-routes')(router)
 require('./routes/category-routes')(router)
 
+
 // DEV
 const morgan = require('morgan')
 app.use(morgan('dev'))
@@ -34,8 +36,14 @@ const httpErrors = require('./lib/httpErrors')
 // MONGODB
 const mongoose = require('mongoose')
 mongoose.Promise = Promise
+
+var options = {
+  server: { socketOptions: { keepAlive: 300000, connectTimeoutMS: 30000 } },
+  replset: { socketOptions: { keepAlive: 300000, connectTimeoutMS : 30000 } }
+}
+
 mongoose
-  .connect(MONGO_URI)
+  .connect(MONGO_URI, options)
   .then(() => {
     console.log(`Mongo connected via ${MONGO_URI}`)
     categorySeeds
@@ -61,6 +69,13 @@ mongoose
 
 app.use(router)
 app.use(httpErrors)
+
+app.get('/', (req, res) => {
+  res.status(200).json({msg: 'Welcome to the MeetNow app. Please refer to documentation for proper routing.'})
+})
+app.get('*', (req, res) => {
+  res.status(404).json({msg: 'Route does not exist!'})
+})
 
 // if not running mocha tests, start listening
 if(require.main === module) {
