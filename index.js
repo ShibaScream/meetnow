@@ -2,6 +2,7 @@
 
 const PORT = process.env.PORT || 3000
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost/meetnow'
+const SEED_DB = process.env.SEED_DB || false
 
 // EXPRESS SERVER
 const Express = require('express')
@@ -13,10 +14,7 @@ const app = Express()
 const bodyParser = require('body-parser')
 
 // SEEDS
-const categorySeeds = require('./seeds/categorySeeds')
-const interestSeeds = require('./seeds/interestSeeds')
-const userSeeds = require('./seeds/userSeeds')
-const activitySeeds = require('./seeds/activitySeeds')
+const initSeeds = require('./seeds/seedInit')
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -26,7 +24,6 @@ require('./routes/user-routes')(router)
 require('./routes/activity-routes')(router)
 require('./routes/interest-routes')(router)
 require('./routes/category-routes')(router)
-
 
 // DEV
 const morgan = require('morgan')
@@ -46,24 +43,9 @@ mongoose
   .connect(MONGO_URI, options)
   .then(() => {
     console.log(`Mongo connected via ${MONGO_URI}`)
-    categorySeeds
-      .seedCategories()
-      .then(categories => {
-        interestSeeds
-          .seedInterests(categories)
-          .then(interests => {
-            userSeeds
-              .seedUsers(interests)
-              .then(users => {
-                activitySeeds
-                .seedActivities(users)
-                .catch(err => console.error(err))
-              })
-              .catch(err => console.error(err))
-          })
-          .catch(err => console.error(err))
-      })
-      .catch(err => console.error(err))
+    if (SEED_DB) {
+      initSeeds()
+    }
   })
   .catch(err => console.error(err))
 

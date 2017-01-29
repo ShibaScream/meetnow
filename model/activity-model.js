@@ -27,6 +27,7 @@ const ActivitySchema = mongoose.Schema({
   },
   startTime: {type: Date, default: Date.now},
   endTime: {type: Date},
+  nearbyUsers: []
 }, {timestamp: true})
 
 ActivitySchema.index({ startLocation : '2dsphere' })

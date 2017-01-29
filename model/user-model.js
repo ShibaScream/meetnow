@@ -3,9 +3,6 @@
 const GeoJSON = require('mongoose-geojson-schema')
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt-nodejs')
-// const jwt = require('jsonwebtoken')
-
-// let devKey = 'dev'
 
 // referenced http://cannoneyed.github.io/geojson/
 // http://stackoverflow.com/questions/32754119/how-to-perform-geospatial-queries-in-mongoose
@@ -37,34 +34,25 @@ const UserSchema = mongoose.Schema({
 
 UserSchema.index({ currentLocation : '2dsphere' })
 
-function hashPass (next) {
-  if (!this.isDirectModified('password'))
+function hashPass (user, next) {
+  if (!user.isDirectModified('password'))
     return next()
   bcrypt.genSalt(10, (err, salt) => {
     if (err) return next(err)
-    bcrypt.hash(this.password, salt, null, (err, hash) => {
+    bcrypt.hash(user.password, salt, null, (err, hash) => {
       if (err) return next(err)
-      this.password = hash
+      user.password = hash
       next()
     })
   })
 }
 
-// UserSchema.methods.hashPassPromised = function () {
-//   return new Promise((resolve, reject) => {
-//     if (this.isDirectModified('password')) {
-//       return resolve(this)
-//     }
-//     bcrypt.hash(this.password, 10, (err, hash) => {
-//       if (err) return reject(err)
-//       this.password = hash
-//       resolve(this)
-//     })
-//   })
-// }
-
-UserSchema.pre('save', hashPass)
-UserSchema.pre('update', hashPass)
+UserSchema.pre('save', function(next) {
+  hashPass(this, next)
+})
+UserSchema.pre('update', function(next) {
+  hashPass(this, next)
+})
 
 UserSchema.methods.checkPass = function(password, callback) {
   bcrypt.compare(password, this.password, function(err, matches) {

@@ -1,10 +1,14 @@
 'use strict'
+
 const chai = require('chai')
 const expect = require('chai').expect
 const chaiHttp = require('chai-http')
 const app = require('../index.js')
 const Activity = require('../model/activity-model.js')
 let server = null
+
+// SEEDS
+const initSeeds = require('../seeds/seedInit')
 
 const activityData = {
   description: 'test description text',
@@ -19,7 +23,7 @@ const activityData = {
 }
 const newActivityData = { description: 'new description text'}
 let activity = null
-let activityTwo = null
+// let activityTwo = null
 let token = null
 chai.use(chaiHttp)
 
@@ -27,20 +31,22 @@ describe('activity-routes.js', () => {
   before(done => {
     server = app.listen(3000, function() {
       console.log('server up')
-      Activity.findOne({description: 'testOne'})
-      .then(act => {
-        activityTwo = act
+      initSeeds()
+      .then(() => {
+        chai
+        .request(app)
+        .get('/login')
+        .auth('runs.more@test.com', '1234pass')
+        .end(function(err, res) {
+          expect(err).to.be.null
+          token = JSON.parse(res.text).token
+          done()
+        })
       })
-      chai.request(app)
-      .get('/login')
-      .auth('runs.more@test.com', '1234pass')
-      .end(function(err, res) {
-        expect(err).to.be.null
-        token = JSON.parse(res.text).token
-        done()
-      })
+      .catch(err => console.error(err))
     })
   })
+
   after(function(done) {
     server.close(function() {
       console.log('server closed')
@@ -73,10 +79,21 @@ describe('activity-routes.js', () => {
       .set('authorization', `Bearer ${token}`)
       .send(activityData)
       .end(function(err, res) {
+        if (err) console.log('Err on Activity POST route', err)
         expect(res.status).to.equal(200)
         expect(res.body.description).to.equal(activityData.description)
         expect(res.body.interest).to.equal(activityData.interest)
         activity = res.body
+        done()
+      })
+    })
+    it('should return 403 when user already has an existing activity', (done) => {
+      chai.request(app)
+      .post('/activity')
+      .set('authorization', `Bearer ${token}`)
+      .send(activityData)
+      .end(function(err, res) {
+        expect(res.status).to.equal(403)
         done()
       })
     })
@@ -105,6 +122,7 @@ describe('activity-routes.js', () => {
   })
   describe('/activity/search', function() {
     it('should return 200 for a valid request', function(done) {
+      activity.nearbyUsers = []
       chai.request(app)
       .get('/activity/search')
       .query({ lat:47.6062, lng:122.3321})
@@ -213,14 +231,19 @@ describe('activity-routes.js', () => {
     })
   })
   it('should add a user to the participants', function(done) {
-    chai.request(app)
-    .post('/activity/join')
-    .set('authorization', `Bearer ${token}`)
-    .send({id: activityTwo._id})
-    .end(function(err, res) {
-      expect(res.status).to.equal(200)
-      done()
-    })
+    Activity
+      .findOne({description: 'testOne'})
+      .then(act => {
+        chai.request(app)
+          .post('/activity/join')
+          .set('authorization', `Bearer ${token}`)
+          .send({id: act._id})
+          .end(function(err, res) {
+            if (err) console.log('Err on Activity POST JOIN route', err)
+            expect(res.status).to.equal(200)
+            done()
+          })
+      })
   })
   describe('/activity/:id DELETE', function() {
     it('should return 401 unauthorized for request without a token', function(done) {
