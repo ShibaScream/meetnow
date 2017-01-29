@@ -5,6 +5,7 @@ const createError = require('http-errors')
 const jsonWebToken = require('jsonwebtoken')
 const sendMail = require('sendmail')()
 const ObjectId = require('mongoose').Types.ObjectId
+const MILES_TO_METERS = 1609.34
 
 const twoFactor = require('../lib/twofactor')
 
@@ -89,7 +90,7 @@ module.exports = function(router) {
       $nearSphere: {
         $geometry: { type: 'Point', coordinates: [lng, lat] },
         $minDistance: 0,
-        $maxDistance: req.authorizedUser.radius
+        $maxDistance: req.authorizedUser.radius * MILES_TO_METERS
       }
     }})
     .then(activities => {
