@@ -4,6 +4,7 @@ const authMiddleware = require('../lib/authMiddleware')
 const Activity = require('../model/activity-model')
 const User = require('../model/user-model')
 const createError = require('http-errors')
+const mongoose = require('mongoose')
 
 const MILES_TO_METERS = 1609.34
 
@@ -14,7 +15,6 @@ module.exports = function(router) {
     let lat = req.query.lat
     let lng = req.query.lng
     let interestId = req.query.interest
-    // let activitiesWithin = []
 
     if (lat == undefined || lng == undefined) {
       return next(createError(400, 'Must include latitude and longitude'))
@@ -51,9 +51,7 @@ module.exports = function(router) {
     .findById(req.body.id)
     .then(activity => {
       if(Object.keys(activity).length === 0) return next(createError(404, 'Not Found'))
-      activity.participants
-      .push(req.authorizedUserId)
-
+      activity.participants.push(req.authorizedUserId)
       activity
       .save()
       .then(activity => {
@@ -65,28 +63,45 @@ module.exports = function(router) {
   })
 
   router.post('/activity', authMiddleware, function(req, res, next) {
+    console.log('\n\n',req.authorizedUser,'\n\n')
     if (Object.keys(req.body).length === 0) return next(createError(400, 'No data included in POST request'))
+    if (mongoose.Types.ObjectId.isValid(req.authorizedUser.currentActivity)) {
+      return next(createError(403, 'User already has an current activity. Please end current activity before starting new one!'))
+    }
     let body = req.body
     body.host = req.authorizedUserId
+    console.log(req.authorizedUserId)
     new Activity(body)
       .save()
       .then(activity => {
         User
-          .find({
-            currentLocation: {
-              $nearSphere: {
-                $geometry: activity.startLocation,
-                $minDistance: 0,
-                $maxDistance: req.authorizedUser.radius * MILES_TO_METERS
-              }
-            }
-          })
-          .select('-password -email -twoFactorEnabled -radius -__v -currentLocation')
-          .populate('interests', 'name')
-          .lean()
-          .then(result => {
-            activity.set('nearbyUsers', result, { strict: false })
-            res.json(activity)
+          .findById(req.authorizedUserId)
+          .then(user => {
+            console.log(user)
+            user.currentActivity = activity._id
+            user
+              .save()
+              .then(() => {
+                User
+                .find({
+                  currentLocation: {
+                    $nearSphere: {
+                      $geometry: activity.startLocation,
+                      $minDistance: 0,
+                      $maxDistance: req.authorizedUser.radius * MILES_TO_METERS
+                    }
+                  }
+                })
+                .select('-password -email -twoFactorEnabled -radius -__v -currentLocation')
+                .populate('interests', 'name')
+                .lean()
+                .then(result => {
+                  activity.set('nearbyUsers', result, { strict: false })
+                  res.json(activity)
+                })
+                .catch(next)
+              })
+              .catch(next)
           })
           .catch(next)
       })

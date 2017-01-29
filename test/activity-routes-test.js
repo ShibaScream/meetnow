@@ -38,7 +38,7 @@ describe('activity-routes.js', () => {
       })
     })
   })
-  
+
   after(function(done) {
     server.close(function() {
       console.log('server closed')
@@ -71,10 +71,21 @@ describe('activity-routes.js', () => {
       .set('authorization', `Bearer ${token}`)
       .send(activityData)
       .end(function(err, res) {
+        if (err) console.log('Err on Activity POST route', err)
         expect(res.status).to.equal(200)
         expect(res.body.description).to.equal(activityData.description)
         expect(res.body.interest).to.equal(activityData.interest)
         activity = res.body
+        done()
+      })
+    })
+    it('should return 403 when user already has an existing activity', (done) => {
+      chai.request(app)
+      .post('/activity')
+      .set('authorization', `Bearer ${token}`)
+      .send(activityData)
+      .end(function(err, res) {
+        expect(res.status).to.equal(403)
         done()
       })
     })
@@ -215,12 +226,12 @@ describe('activity-routes.js', () => {
     Activity
       .findOne({description: 'testOne'})
       .then(act => {
-        console.log(act)
         chai.request(app)
           .post('/activity/join')
           .set('authorization', `Bearer ${token}`)
           .send({id: act._id})
           .end(function(err, res) {
+            if (err) console.log('Err on Activity POST JOIN route', err)
             expect(res.status).to.equal(200)
             done()
           })
