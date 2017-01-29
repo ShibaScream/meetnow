@@ -36,8 +36,14 @@ const httpErrors = require('./lib/httpErrors')
 // MONGODB
 const mongoose = require('mongoose')
 mongoose.Promise = Promise
+
+var options = {
+  server: { socketOptions: { keepAlive: 300000, connectTimeoutMS: 30000 } },
+  replset: { socketOptions: { keepAlive: 300000, connectTimeoutMS : 30000 } }
+}
+
 mongoose
-  .connect(MONGO_URI)
+  .connect(MONGO_URI, options)
   .then(() => {
     console.log(`Mongo connected via ${MONGO_URI}`)
     categorySeeds
