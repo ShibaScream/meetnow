@@ -14,7 +14,7 @@ const app = Express()
 const bodyParser = require('body-parser')
 
 // SEEDS
-const initSeeds = require('./seeds/seedInit')
+const initSeeds = require('./seeds/seedInit.js')
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
