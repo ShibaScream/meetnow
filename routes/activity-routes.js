@@ -5,12 +5,12 @@ const Activity = require('../model/activity-model')
 const User = require('../model/user-model')
 const createError = require('http-errors')
 
-// const MILES_PER_DEG = 55.2428
+const MILES_TO_METERS = 1609.34
 
 module.exports = function(router) {
 
   router.get('/activity/search', function(req, res, next) {
-    let dist = req.query.dist || 10000
+    let dist = req.query.dist || 10
     let lat = req.query.lat
     let lng = req.query.lng
     let interestId = req.query.interest
@@ -30,27 +30,22 @@ module.exports = function(router) {
               coordinates: coords
             },
             $minDistance: 0,
-            $maxDistance: dist
+            $maxDistance: dist * MILES_TO_METERS
           }
         }
       })
       .then(activities => {
-        // activitiesWithin = activities.filter(function(activity) {
-        //   return distanceInMiles(activity.startLocation.coordinates[0], activity.startLocation.coordinates[1], lat, lng) < radius
-        // })
+        if(Object.keys(activities).length === 0) return next(createError(404, 'Not Found'))
         if (interestId) {
           activities = activities.filter(activity => activity.interest == interestId)
+          if(Object.keys(activities).length === 0) return next(createError(404, 'Not Found'))
         }
-
-        if(Object.keys(activities).length === 0) return next(createError(404, 'Not Found'))
-
         res.json(activities)
       })
       .catch(next)
   })
 
   router.post('/activity/join', authMiddleware, function(req, res, next) {
-    console.log(req.body._id)
     if (Object.keys(req.body).length === 0) return next(createError(400, 'No data included in POST request'))
     Activity
     .findById(req.body.id)
@@ -82,7 +77,7 @@ module.exports = function(router) {
               $nearSphere: {
                 $geometry: activity.startLocation,
                 $minDistance: 0,
-                $maxDistance: req.authorizedUser.radius * 1000
+                $maxDistance: req.authorizedUser.radius * MILES_TO_METERS
               }
             }
           })
@@ -119,10 +114,8 @@ module.exports = function(router) {
         }
 
         if(activity.host.equals(req.authorizedUserId)) {
-          console.log('host is the same')
           activity
             .update(req.body)
-            // .save()
             .then(activity => {
               res.json(activity)
             })
@@ -155,7 +148,3 @@ module.exports = function(router) {
   })
 
 }
-
-// function distanceInMiles(x1, y1, x2, y2) {
-//   return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)) * MILES_PER_DEG
-// }
