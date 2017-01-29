@@ -1,10 +1,14 @@
 'use strict'
+
 const chai = require('chai')
 const expect = require('chai').expect
 const chaiHttp = require('chai-http')
 const app = require('../index.js')
 const Activity = require('../model/activity-model.js')
 let server = null
+
+// SEEDS
+const initSeeds = require('../seeds/seedInit')
 
 const activityData = {
   description: 'test description text',
@@ -19,7 +23,7 @@ const activityData = {
 }
 const newActivityData = { description: 'new description text'}
 let activity = null
-let activityTwo = null
+// let activityTwo = null
 let token = null
 chai.use(chaiHttp)
 
@@ -27,15 +31,19 @@ describe('activity-routes.js', () => {
   before(done => {
     server = app.listen(3000, function() {
       console.log('server up')
-      chai
-      .request(app)
-      .get('/login')
-      .auth('runs.more@test.com', '1234pass')
-      .end(function(err, res) {
-        expect(err).to.be.null
-        token = JSON.parse(res.text).token
-        done()
+      initSeeds()
+      .then(() => {
+        chai
+        .request(app)
+        .get('/login')
+        .auth('runs.more@test.com', '1234pass')
+        .end(function(err, res) {
+          expect(err).to.be.null
+          token = JSON.parse(res.text).token
+          done()
+        })
       })
+      .catch(err => console.error(err))
     })
   })
 
