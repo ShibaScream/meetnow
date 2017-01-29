@@ -4,6 +4,7 @@ const authMiddleware = require('../lib/authMiddleware')
 const Activity = require('../model/activity-model')
 const User = require('../model/user-model')
 const createError = require('http-errors')
+const ObjectId = require('mongoose').Types.ObjectId
 
 const MILES_TO_METERS = 1609.34
 
@@ -141,19 +142,20 @@ module.exports = function(router) {
   router.delete('/activity/:id', authMiddleware, function(req, res, next) {
     if (!req.params.id) return next(createError(400, 'No activity id'))
     Activity
-      .findById(req.params.id)
-      .then(activity => {
-        if (activity == null) {
+      .where({
+        _id: new ObjectId(req.params.id),
+        host: new ObjectId(req.authorizedUserId)
+      })
+      .update({endTime: Date.now()})
+      .then(result => {
+        console.log('this is the activity returned from update:', result)
+        if (!result.nModified) {
           return next(createError(404, 'Activity not found'))
         }
-        if(activity.host.equals(req.authorizedUserId)) {
-          activity.remove(function(err) {
-            if(err) return next(createError(404, err.message))
-            res.status(202).end()
-          })
-        } else {
-          next(createError(401, 'Not authorized'))
+        if(!result.ok) {
+          return next(createError(500, 'Delete experienced failure'))
         }
+        res.status(202).end()
       })
       .catch(next)
   })

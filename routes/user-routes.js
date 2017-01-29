@@ -4,6 +4,7 @@ const parseAuth = require('basic-auth')
 const createError = require('http-errors')
 const jsonWebToken = require('jsonwebtoken')
 const sendMail = require('sendmail')()
+const ObjectId = require('mongoose').Types.ObjectId
 
 const twoFactor = require('../lib/twofactor')
 
@@ -12,6 +13,8 @@ const TOKEN_EXPIRY_TIME = 60 * 60 * 24
 
 const authMiddleware = require('../lib/authMiddleware')
 const User = require('../model/user-model')
+const Interest = require('../model/interest-model')
+const Activity = require('../model/activity-model')
 
 module.exports = function(router) {
   router.post('/user', function(req, res, next) {
@@ -133,10 +136,18 @@ module.exports = function(router) {
   })
 
   router.delete('/user/:userId', authMiddleware, function(req, res, next) {
+    Interest
+      .update({users: new ObjectId(req.params.userId)}, {$pullAll: {users: [new ObjectId(req.params.userId)]}})
+    Activity
+      .where({
+        host: new ObjectId(req.params.userId),
+        endTime: null
+      })
+      .setOptions({multi: true})
+      .update({endTime: Date.now()})
     User
       .findByIdAndRemove(req.params.userId)
-      .then(function(err) {
-        if (err) return next(err)
+      .then(() => {
         res.status(202)
         res.end()
       })
