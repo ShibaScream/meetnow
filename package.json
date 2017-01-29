@@ -32,7 +32,8 @@
     "mongodb": "^2.2.22",
     "mongoose": "^4.7.5",
     "mongoose-geojson-schema": "^2.1.2",
-    "sendmail": "^1.1.1"
+    "sendmail": "^1.1.1",
+    "morgan": "^1.7.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
@@ -41,7 +42,6 @@
     "gulp-eslint": "^3.0.1",
     "gulp-mocha": "^3.0.1",
     "gulp-plumber": "^1.1.0",
-    "mocha": "^3.2.0",
-    "morgan": "^1.7.0"
+    "mocha": "^3.2.0"
   }
 }
